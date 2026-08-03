@@ -41,6 +41,15 @@
   background: linear-gradient(180deg, #22443c, #172a26);
 }
 
+.choiceRow img {
+  display: block;
+  width: 100%;
+  height: 54px;
+  object-fit: contain;
+  margin-bottom: 4px;
+  pointer-events: none;
+}
+
 .drawer {
   display: grid;
   gap: 9px;
@@ -55,6 +64,7 @@
   grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 4px;
   min-height: 110px;
+  z-index: 5;
 }
 
 .pianoKeys button {
@@ -82,6 +92,56 @@
   padding: 8px;
   color: #1e1613;
   background: #fff6dd;
+}
+
+.clockPuzzle,
+.musicBoxClue {
+  position: relative;
+  width: min(190px, 52vw);
+  aspect-ratio: 1;
+  justify-self: center;
+}
+
+.clockPuzzle img,
+.musicBoxClue img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.clockHand {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 4px;
+  border-radius: 4px;
+  background: #3f2a19;
+  transform-origin: 50% 100%;
+}
+
+.hourHand {
+  height: 52px;
+  transform: translate(-50%, -100%) rotate(90deg);
+}
+
+.minuteHand {
+  height: 76px;
+  transform: translate(-50%, -100%) rotate(20deg);
+}
+
+.musicBoxClue {
+  width: min(220px, 62vw);
+}
+
+.musicBoxClue span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #2a1a0e;
+  font-size: 1.25rem;
+  font-weight: 700;
 }
 
 .confirmActions {

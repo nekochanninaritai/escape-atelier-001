@@ -7,8 +7,10 @@ import { TitleScene } from '../scenes/TitleScene';
 import { MessageToast } from '../components/common/MessageToast';
 import { SettingsModal } from '../components/settings/SettingsModal';
 import { HintModal } from '../components/game/HintModal';
+import { imageAssets } from '../data/imageAssets';
 import { useGame } from '../context/useGame';
 import { audioService } from '../services/audioService';
+import { preloadImages } from '../services/preloadService';
 import type { SceneId } from '../types/game';
 
 const focusScenes: SceneId[] = ['piano', 'clock', 'desk', 'bookshelf', 'musicBox', 'door'];
@@ -33,6 +35,21 @@ export function App() {
     else if (state.currentScene === 'ending') audioService.playBgm('ending', state.settings);
     else audioService.playBgm('room', state.settings);
   }, [state.currentScene, state.settings]);
+
+  useEffect(() => {
+    if (state.currentScene === 'title') preloadImages([imageAssets.rooms.main]);
+    if (state.currentScene === 'room') {
+      preloadImages([
+        imageAssets.rooms.piano,
+        imageAssets.rooms.bookshelf,
+        imageAssets.rooms.clock,
+        imageAssets.rooms.desk,
+        imageAssets.rooms.musicBox,
+        imageAssets.rooms.door,
+      ]);
+    }
+    if (state.solvedPuzzles.includes('clockMusicBox')) preloadImages([imageAssets.rooms.pianoOpen, imageAssets.ending.background]);
+  }, [state.currentScene, state.solvedPuzzles]);
 
   return (
     <>

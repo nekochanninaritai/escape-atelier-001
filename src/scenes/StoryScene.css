@@ -11,6 +11,15 @@
     linear-gradient(180deg, #263b37 0, #2b211c 54%, #15100e 100%);
 }
 
+.storyBackground {
+  position: absolute;
+  inset: 0;
+}
+
+.storyBackground img {
+  filter: saturate(0.95) brightness(0.78);
+}
+
 .storyText {
   width: min(100%, 440px);
   border: 1px solid #a88c51;

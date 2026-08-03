@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { items } from '../../data/items';
 import { useGame } from '../../context/useGame';
 import type { ItemId } from '../../types/game';
+import { GameImage } from '../common/GameImage';
 import { Modal } from '../common/Modal';
 import './InventoryBar.css';
 
@@ -31,7 +32,9 @@ export function InventoryBar() {
                     }}
                     aria-label={`${item.name}${state.selectedItemId === item.id ? ' 選択中' : ''}`}
                   >
-                    <span className="itemIcon" aria-hidden="true">{item.name.slice(0, 1)}</span>
+                    <span className="itemIcon" aria-hidden="true">
+                      <img src={item.image} alt="" draggable={false} />
+                    </span>
                     <span>{item.name}</span>
                   </button>
                   <button type="button" className="detailButton" onClick={() => setDetailItem(item.id)} aria-label={`${item.name}の詳細`}>
@@ -48,7 +51,12 @@ export function InventoryBar() {
       {detailItem && (
         <Modal title={items[detailItem].name} onClose={() => setDetailItem(null)}>
           <div className="itemDetail">
-            <div className="largeItemIcon" aria-label={items[detailItem].name}>{items[detailItem].name.slice(0, 1)}</div>
+            <GameImage
+              src={items[detailItem].image}
+              alt={items[detailItem].alt}
+              fallbackLabel={items[detailItem].name}
+              className="largeItemIcon"
+            />
             <p>{items[detailItem].description}</p>
           </div>
         </Modal>

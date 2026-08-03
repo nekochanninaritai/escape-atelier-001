@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { endingPages } from '../data/messages';
+import { imageAssets } from '../data/imageAssets';
 import { useGame } from '../context/useGame';
+import { GameImage } from '../components/common/GameImage';
 import './StoryScene.css';
 
 export function EndingScene() {
@@ -10,6 +12,7 @@ export function EndingScene() {
 
   return (
     <main className="storyScene endingScene">
+      <GameImage src={imageAssets.ending.background} alt="夕日の光が差し込む開いた音楽室の扉" fallbackLabel="エンディング背景" className="storyBackground" decorative />
       <div className="endingLight" />
       <section className="storyText">
         {!finished ? (

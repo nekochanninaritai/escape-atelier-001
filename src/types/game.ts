@@ -51,6 +51,7 @@ export type ItemDefinition = {
   name: string;
   description: string;
   image: string;
+  alt: string;
   usedDescription?: string;
 };
 

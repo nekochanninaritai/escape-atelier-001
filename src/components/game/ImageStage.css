@@ -1,36 +1,26 @@
 .imageStage {
   position: relative;
-  min-height: clamp(360px, 62dvh, 650px);
+  width: 100%;
+  aspect-ratio: 9 / 16;
+  min-height: 0;
+  height: auto;
+  max-height: 680px;
   overflow: hidden;
   isolation: isolate;
   background: #231915;
 }
 
-.roomArt {
+.stageImage {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(90deg, transparent 0 8%, #33231c 8% 10%, transparent 10% 42%, #271c19 42% 44%, transparent 44% 83%, #2c201b 83% 86%, transparent 86%),
-    radial-gradient(circle at 78% 22%, rgba(208, 141, 62, 0.48), transparent 24%),
-    linear-gradient(180deg, #243630 0 46%, #3b2a20 47% 75%, #201713 76%);
 }
 
-.windowGlow {
+.stageVignette {
   position: absolute;
-  right: 8%;
-  top: 11%;
-  width: 22%;
-  height: 28%;
-  border: 4px solid #5f4930;
-  background: linear-gradient(135deg, #f0b45d, #4d6d68);
-  box-shadow: 0 0 54px rgba(229, 160, 81, 0.35);
-}
-
-.floorLines {
-  position: absolute;
-  inset: 68% -15% 0;
-  background: repeating-linear-gradient(14deg, rgba(255, 238, 183, 0.08) 0 2px, transparent 2px 34px);
-  transform: perspective(260px) rotateX(42deg);
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.16), transparent 18%, transparent 76%, rgba(0, 0, 0, 0.34));
 }
 
 .stageLabel {
@@ -42,36 +32,50 @@
   border-radius: 6px;
   background: rgba(28, 20, 16, 0.72);
   color: #f7efd9;
+  z-index: 3;
 }
 
 .hotspot {
   position: absolute;
-  border: 0;
-  background: transparent;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
   box-shadow: none;
   min-height: 44px;
   padding: 0;
-  z-index: 2;
+  z-index: 4;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .hotspotDebug {
-  border: 1px dashed #f3ce69;
-  background: rgba(214, 189, 100, 0.16);
+  border: 1px dashed #f3ce69 !important;
+  background: rgba(214, 189, 100, 0.16) !important;
   color: #fff8df;
 }
 
-.imageStage-piano .roomArt::after,
-.imageStage-desk .roomArt::after,
-.imageStage-bookshelf .roomArt::after,
-.imageStage-clock .roomArt::after,
-.imageStage-musicBox .roomArt::after,
-.imageStage-door .roomArt::after {
-  content: "";
+.hotspot:focus,
+.hotspot:focus-visible {
+  outline: 0 !important;
+}
+
+.hotspot span {
+  display: none;
+}
+
+.hotspotDebug span {
   position: absolute;
-  left: 12%;
-  right: 12%;
-  top: 23%;
-  bottom: 18%;
-  border: 2px solid rgba(218, 190, 107, 0.45);
-  background: rgba(24, 18, 15, 0.28);
+  left: 4px;
+  top: 4px;
+  display: inline-block;
+  max-width: calc(100% - 8px);
+  padding: 2px 5px;
+  border-radius: 4px;
+  overflow: hidden;
+  color: #fff8df;
+  background: rgba(28, 20, 16, 0.78);
+  font-size: 0.68rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }

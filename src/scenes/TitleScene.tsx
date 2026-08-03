@@ -1,5 +1,7 @@
 import { gameConfig } from '../data/gameConfig';
+import { imageAssets } from '../data/imageAssets';
 import { useGame } from '../context/useGame';
+import { GameImage } from '../components/common/GameImage';
 import './TitleScene.css';
 
 export function TitleScene({ onSettings }: { onSettings: () => void }) {
@@ -8,6 +10,7 @@ export function TitleScene({ onSettings }: { onSettings: () => void }) {
 
   return (
     <main className="titleScene">
+      <GameImage src={imageAssets.title.background} alt="夕暮れのアンティークな音楽室" fallbackLabel="タイトル背景" className="titleBackground" decorative />
       <div className="titleGlow" />
       <section className="titleContent" aria-label="タイトル">
         <p>{gameConfig.seriesName}</p>

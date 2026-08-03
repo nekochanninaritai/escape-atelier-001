@@ -27,7 +27,7 @@ VITE_BASE_PATH=/escape-atelier-001/ npm run build
 
 ## 画像の差し替え
 
-`src/data/items.ts`の`image`名と、将来的に追加する`src/assets/images`配下のファイル名を対応させてください。想定ファイル名は以下です。
+画像は`src/assets/images`配下に置き、`src/data/imageAssets.ts`で一元管理します。コンポーネントへ画像パスを直接散在させないでください。
 
 - `room-main.webp`
 - `room-piano.webp`
@@ -41,7 +41,13 @@ VITE_BASE_PATH=/escape-atelier-001/ npm run build
 - `item-completed-sheet.webp`
 - `item-door-key.webp`
 
-現状はCSSプレースホルダーで進行できるため、画像がなくても遊べます。
+画像読み込みに失敗した場合は`GameImage`がCSSプレースホルダーへフォールバックするため、ゲーム進行は止まりません。
+
+生成・変換プロンプトは`docs/image-prompts.md`と`assets/image-generation-prompts.md`に記録しています。画像を再生成した場合は、必要に応じて以下を実行してください。
+
+```bash
+node scripts/prepare-assets.mjs
+```
 
 ## 音声の差し替え
 

@@ -1,6 +1,6 @@
 export const SAVE_VERSION = 1;
 export const SAVE_KEY = 'escape-atelier-001-save';
-export const DEBUG_HOTSPOTS = import.meta.env.DEV;
+export const DEBUG_HOTSPOTS = import.meta.env.VITE_DEBUG_HOTSPOTS !== 'false';
 
 export const gameConfig = {
   seriesName: 'Escape Atelier',

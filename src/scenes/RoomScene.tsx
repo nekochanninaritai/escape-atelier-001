@@ -1,5 +1,6 @@
 import { GameShell } from '../components/game/GameShell';
 import { ImageStage } from '../components/game/ImageStage';
+import { imageAssets } from '../data/imageAssets';
 import { roomHotspots } from '../data/scenes';
 import { useGame } from '../context/useGame';
 
@@ -11,6 +12,8 @@ export function RoomScene({ onSettings, onHints }: { onSettings: () => void; onH
       <ImageStage
         label="音楽室"
         variant="room"
+        src={imageAssets.rooms.main}
+        alt="夕暮れの古い洋館にある音楽室の全景"
         hotspots={roomHotspots}
         onHotspot={(hotspot) => {
           dispatch({ type: 'INSPECT', pointId: hotspot.id });

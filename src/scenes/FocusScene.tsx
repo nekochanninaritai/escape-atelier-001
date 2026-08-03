@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { GameShell } from '../components/game/GameShell';
 import { ImageStage } from '../components/game/ImageStage';
 import { Modal } from '../components/common/Modal';
+import { imageAssets } from '../data/imageAssets';
 import { items } from '../data/items';
 import { puzzles } from '../data/puzzles';
 import { useGame } from '../context/useGame';
@@ -27,6 +28,15 @@ const sceneCopy: Record<string, { title: string; description: string; variant: s
   door: { title: '出口の扉', description: '重い木の扉。鍵が掛かっている。', variant: 'door' },
 };
 
+const puzzlePieceImages: Record<ItemId, string> = {
+  sheetPiece1: imageAssets.puzzles.sheetPiece01,
+  sheetPiece2: imageAssets.puzzles.sheetPiece02,
+  sheetPiece3: imageAssets.puzzles.sheetPiece03,
+  windingKey: imageAssets.items.windingKey,
+  completedSheet: imageAssets.puzzles.completeSheet,
+  doorKey: imageAssets.items.doorKey,
+};
+
 export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
   const { state, dispatch, showMessage } = useGame();
   const [sheetOrder, setSheetOrder] = useState<ItemId[]>([]);
@@ -37,6 +47,18 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
 
   const hasAllFragments = fragmentIds.every((id) => state.inventory.includes(id) || state.collectedItems.includes(id));
   const solved = useMemo(() => new Set(state.solvedPuzzles), [state.solvedPuzzles]);
+  const sceneImage = (() => {
+    if (sceneId === 'desk' && solved.has('sheetOrder')) return imageAssets.rooms.deskOpen;
+    if (sceneId === 'musicBox' && state.flags.musicBoxPlayed) return imageAssets.rooms.musicBoxActive;
+    if (sceneId === 'piano' && solved.has('pianoMelody')) return imageAssets.rooms.pianoOpen;
+    if (sceneId === 'door' && state.isCleared) return imageAssets.rooms.doorOpen;
+    if (sceneId === 'piano') return imageAssets.rooms.piano;
+    if (sceneId === 'clock') return imageAssets.rooms.clock;
+    if (sceneId === 'bookshelf') return imageAssets.rooms.bookshelf;
+    if (sceneId === 'musicBox') return imageAssets.rooms.musicBox;
+    if (sceneId === 'door') return imageAssets.rooms.door;
+    return imageAssets.rooms.desk;
+  })();
 
   const collect = (itemId: ItemId, message: string) => {
     dispatch({ type: 'COLLECT_ITEM', itemId });
@@ -134,7 +156,7 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
 
   return (
     <GameShell onBack={() => dispatch({ type: 'GO_SCENE', scene: 'room' })} onSettings={onSettings} onHints={onHints}>
-      <ImageStage label={copy.title} variant={copy.variant}>
+      <ImageStage label={copy.title} variant={copy.variant} src={sceneImage} alt={`${copy.title}の拡大画像`}>
         <div className="focusPanel">
           <h2>{copy.title}</h2>
           <p>{copy.description}</p>
@@ -151,6 +173,7 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
                   <div className="choiceRow">
                     {fragmentIds.map((itemId) => (
                       <button key={itemId} type="button" className={sheetOrder.includes(itemId) ? 'chosen' : ''} onClick={() => toggleSheetPiece(itemId)}>
+                        <img src={puzzlePieceImages[itemId]} alt={items[itemId].alt} draggable={false} />
                         {items[itemId].name.replace('楽譜の切れ端 ', '')}
                       </button>
                     ))}
@@ -186,6 +209,11 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
 
           {sceneId === 'clock' && (
             <div className="puzzleBox">
+              <div className="clockPuzzle">
+                <img src={imageAssets.puzzles.clockFace} alt="音楽記号が並んだ古時計の文字盤" draggable={false} />
+                <span className="clockHand hourHand" />
+                <span className="clockHand minuteHand" />
+              </div>
               <p>時計盤には 1=月、3=♪、4=扉 と刻まれている。</p>
               {state.flags.musicBoxPlayed && !solved.has('clockMusicBox') && (
                 <>
@@ -201,9 +229,17 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
           )}
 
           {sceneId === 'musicBox' && (
-            <button type="button" onClick={useMusicBox}>
-              オルゴールを調べる
-            </button>
+            <>
+              {state.flags.musicBoxPlayed && (
+                <div className="musicBoxClue">
+                  <img src={imageAssets.puzzles.musicBoxClue} alt="オルゴールから現れた金属プレート" draggable={false} />
+                  <span aria-label="オルゴールの手掛かり">♪ 月 扉</span>
+                </div>
+              )}
+              <button type="button" onClick={useMusicBox}>
+                オルゴールを調べる
+              </button>
+            </>
           )}
 
           {sceneId === 'door' && (
