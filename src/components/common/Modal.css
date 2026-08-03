@@ -1,0 +1,39 @@
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(8, 6, 5, 0.72);
+}
+
+.modalPanel {
+  width: min(100%, 430px);
+  max-height: min(78vh, 620px);
+  overflow: auto;
+  border: 1px solid #b59a56;
+  border-radius: 8px;
+  padding: 16px;
+  background: #241a16;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.iconButton {
+  width: 44px;
+  min-height: 44px;
+  padding: 0;
+}

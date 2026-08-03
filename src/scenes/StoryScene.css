@@ -1,0 +1,50 @@
+.storyScene {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: grid;
+  place-items: end center;
+  padding: 24px 16px;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 74% 18%, rgba(224, 154, 85, 0.46), transparent 25%),
+    linear-gradient(180deg, #263b37 0, #2b211c 54%, #15100e 100%);
+}
+
+.storyText {
+  width: min(100%, 440px);
+  border: 1px solid #a88c51;
+  border-radius: 8px;
+  padding: 18px;
+  background: rgba(31, 23, 19, 0.9);
+  line-height: 1.85;
+  z-index: 1;
+}
+
+.storyText p {
+  margin: 0 0 18px;
+  white-space: pre-line;
+}
+
+.storyText h1 {
+  margin: 0 0 14px;
+  color: #fff2ba;
+}
+
+.storyActions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.endingLight {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, rgba(242, 190, 100, 0.34), transparent 58%);
+  animation: endingGlow 5s ease-in-out infinite alternate;
+}
+
+@keyframes endingGlow {
+  from { opacity: 0.55; }
+  to { opacity: 1; }
+}

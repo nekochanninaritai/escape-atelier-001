@@ -1,0 +1,9 @@
+.hintPanel {
+  display: grid;
+  gap: 12px;
+}
+
+.hintPanel p {
+  margin: 0;
+  line-height: 1.7;
+}

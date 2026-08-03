@@ -1,0 +1,14 @@
+.messageToast {
+  position: fixed;
+  left: 50%;
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 30;
+  width: min(calc(100% - 24px), 480px);
+  transform: translateX(-50%);
+  padding: 13px 15px;
+  border: 1px solid #d1b86c;
+  border-radius: 8px;
+  color: #fff8df;
+  background: rgba(28, 20, 16, 0.94);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+}

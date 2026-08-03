@@ -1,0 +1,75 @@
+.inventory {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.inventorySlot {
+  min-height: 66px;
+  border: 1px solid #705a36;
+  border-radius: 6px;
+  background: rgba(16, 13, 11, 0.72);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: stretch;
+  overflow: hidden;
+}
+
+.itemButton {
+  min-height: 64px;
+  border: 0;
+  box-shadow: none;
+  display: grid;
+  place-items: center;
+  gap: 2px;
+  padding: 4px;
+  font-size: 0.68rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+}
+
+.itemButton.selected {
+  outline: 2px solid #d6bd64;
+  background: linear-gradient(180deg, #22443c, #192c28);
+}
+
+.itemIcon,
+.largeItemIcon {
+  display: grid;
+  place-items: center;
+  border: 1px solid #b8a060;
+  background: #efe3bf;
+  color: #2b2119;
+}
+
+.itemIcon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+}
+
+.detailButton {
+  min-width: 24px;
+  min-height: 64px;
+  padding: 0;
+  border-width: 0 0 0 1px;
+  border-radius: 0;
+}
+
+.emptySlot {
+  display: block;
+  min-height: 64px;
+}
+
+.itemDetail {
+  display: grid;
+  gap: 14px;
+  place-items: center;
+}
+
+.largeItemIcon {
+  width: 96px;
+  height: 96px;
+  border-radius: 8px;
+  font-size: 2rem;
+}
