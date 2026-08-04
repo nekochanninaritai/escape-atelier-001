@@ -15,7 +15,7 @@ import type { SceneId } from '../types/game';
 
 const focusScenes: SceneId[] = ['piano', 'clock', 'desk', 'bookshelf', 'globe', 'musicBox', 'door'];
 
-export function App() {
+export function App({ onSeriesSelect }: { onSeriesSelect?: () => void }) {
   const { state } = useGame();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [hintsOpen, setHintsOpen] = useState(false);
@@ -54,13 +54,13 @@ export function App() {
 
   return (
     <>
-      {state.currentScene === 'title' && <TitleScene onSettings={() => setSettingsOpen(true)} />}
+      {state.currentScene === 'title' && <TitleScene onSettings={() => setSettingsOpen(true)} onSeriesSelect={onSeriesSelect} />}
       {state.currentScene === 'prologue' && <PrologueScene />}
       {state.currentScene === 'room' && <RoomScene onSettings={() => setSettingsOpen(true)} onHints={() => setHintsOpen(true)} />}
       {focusScenes.includes(state.currentScene) && (
         <FocusScene sceneId={state.currentScene} onSettings={() => setSettingsOpen(true)} onHints={() => setHintsOpen(true)} />
       )}
-      {state.currentScene === 'ending' && <EndingScene />}
+      {state.currentScene === 'ending' && <EndingScene onSeriesSelect={onSeriesSelect} />}
       <MessageToast />
       {settingsOpen && <SettingsModal onClose={() => setSettingsOpen(false)} />}
       {hintsOpen && <HintModal onClose={() => setHintsOpen(false)} />}

@@ -1,0 +1,312 @@
+.greenTitle,
+.greenStory,
+.greenShell {
+  min-height: 100svh;
+  color: #fff8e9;
+  background: #17231d;
+  padding: max(12px, env(safe-area-inset-top)) 10px max(12px, env(safe-area-inset-bottom));
+}
+
+.greenTitle,
+.greenStory {
+  display: grid;
+  place-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.greenBackdrop,
+.greenImagePlaceholder,
+.greenBackdropImage,
+.greenStageImage {
+  position: absolute;
+  inset: 0;
+}
+
+.greenBackdrop,
+.greenImagePlaceholder {
+  background:
+    radial-gradient(circle at 52% 10%, rgba(226, 146, 79, 0.42), transparent 28%),
+    linear-gradient(160deg, #2e4a3c 0%, #18251f 50%, #4b3427 100%);
+}
+
+.greenBackdropImage,
+.greenStageImage {
+  width: 100%;
+  height: 100%;
+}
+
+.greenBackdropImage img,
+.greenStageImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.greenBackdropImage::after,
+.greenStageImage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(10, 16, 12, 0.2), rgba(10, 16, 12, 0.46)),
+    radial-gradient(ellipse at 50% 64%, transparent 0 40%, rgba(8, 12, 10, 0.42) 100%);
+  pointer-events: none;
+}
+
+.greenBackdrop::after,
+.greenImagePlaceholder::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 0 18%, rgba(255, 248, 233, 0.12) 18% 19%, transparent 19% 38%, rgba(255, 248, 233, 0.09) 38% 39%, transparent 39%),
+    radial-gradient(ellipse at 50% 54%, rgba(141, 181, 143, 0.34), transparent 38%);
+}
+
+.greenTitleText,
+.greenStoryText {
+  position: relative;
+  width: min(100%, 520px);
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+}
+
+.greenTitleText p,
+.greenStoryText p {
+  margin: 0;
+  line-height: 1.8;
+}
+
+.greenTitleText > p {
+  color: #d7b46a;
+}
+
+.greenTitleText h1,
+.greenStoryText h1 {
+  margin: 0;
+  font-size: clamp(2rem, 10vw, 3.6rem);
+  line-height: 1.16;
+}
+
+.greenTitleText h1 span {
+  display: block;
+  font-size: 0.58em;
+  margin-top: 8px;
+}
+
+.greenButtons,
+.greenBottom {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.greenButtons button,
+.greenBottom button,
+.greenHeader button,
+.greenFocus button,
+.greenInventory button,
+.greenConfirm button,
+.greenHints button {
+  min-height: 44px;
+  border-radius: 8px;
+  border: 1px solid rgba(215, 180, 106, 0.62);
+  color: #fff8e9;
+  background: rgba(28, 39, 32, 0.86);
+  padding: 10px 14px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.greenButtons button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.greenShell {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto auto;
+  gap: 10px;
+  overflow-x: hidden;
+}
+
+.greenHeader {
+  display: grid;
+  grid-template-columns: 58px 1fr 58px;
+  gap: 8px;
+  align-items: center;
+}
+
+.greenHeader div {
+  text-align: center;
+}
+
+.greenHeader span,
+.greenHeader strong {
+  display: block;
+}
+
+.greenHeader span {
+  color: #d7b46a;
+  font-size: 0.78rem;
+}
+
+.greenHeader strong {
+  font-size: clamp(0.82rem, 3.5vw, 1rem);
+}
+
+.greenStage {
+  position: relative;
+  min-height: 420px;
+  aspect-ratio: 9 / 13.5;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(215, 180, 106, 0.48);
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.42);
+}
+
+.greenStage h2 {
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  margin: 0;
+  text-shadow: 0 2px 12px #000;
+}
+
+.greenHotspot {
+  position: absolute;
+  min-width: 44px;
+  min-height: 44px;
+  border: 0;
+  background: rgba(215, 180, 106, 0);
+}
+
+.greenHotspot:focus-visible {
+  outline: 3px solid #fff8e9;
+  background: rgba(215, 180, 106, 0.28);
+}
+
+.greenFocus {
+  position: absolute;
+  inset: auto 12px 12px;
+  display: grid;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 8px;
+  background: rgba(20, 30, 25, 0.88);
+  border: 1px solid rgba(215, 180, 106, 0.5);
+}
+
+.greenFocus h2,
+.greenFocus p {
+  margin: 0;
+}
+
+.greenInventory {
+  min-height: 78px;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 8px;
+  border-radius: 8px;
+  background: #101812;
+}
+
+.greenInventory p {
+  margin: auto;
+  color: #cdbf9f;
+}
+
+.greenInventory button {
+  flex: 0 0 86px;
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  gap: 3px;
+  font-size: 0.72rem;
+}
+
+.greenInventory img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.42));
+}
+
+.greenInventory button.selected {
+  background: #574220;
+  outline: 2px solid #d7b46a;
+}
+
+.greenInventory strong {
+  font-size: 1.1rem;
+}
+
+.greenBottom {
+  justify-content: center;
+}
+
+.colorPuzzle {
+  display: grid;
+  gap: 8px;
+}
+
+.colorPuzzle div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.colorPuzzle button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.colorPuzzle span {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid #17231d;
+}
+
+.greenSettings,
+.greenHints {
+  display: grid;
+  gap: 12px;
+}
+
+.greenSettings label {
+  display: grid;
+  gap: 6px;
+}
+
+.greenHints section {
+  border-top: 1px solid rgba(215, 180, 106, 0.24);
+  padding-top: 10px;
+}
+
+.greenHints h3,
+.greenHints p {
+  margin: 0 0 8px;
+}
+
+.greenConfirm {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+@media (min-width: 720px) {
+  .greenShell {
+    width: min(100%, 780px);
+    margin: 0 auto;
+  }
+
+  .greenStage {
+    min-height: 560px;
+    max-height: 68svh;
+  }
+}

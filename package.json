@@ -1,5 +1,5 @@
 {
-  "name": "escape-atelier-001",
+  "name": "escape-atelier-series",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -7,6 +7,7 @@
     "dev": "vite --host 0.0.0.0",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "test": "vitest run",
     "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
@@ -16,6 +17,7 @@
     "eslint-plugin-react-refresh": "latest",
     "globals": "latest",
     "react": "latest",
+    "phaser": "^3.90.0",
     "react-dom": "latest",
     "typescript": "latest",
     "typescript-eslint": "latest",
@@ -26,6 +28,7 @@
     "@types/node": "^26.1.2",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.4",
-    "sharp": "^0.35.3"
+    "sharp": "^0.35.3",
+    "vitest": "^4.0.0"
   }
 }

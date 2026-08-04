@@ -1,0 +1,72 @@
+.phaserPuzzleActive {
+  overflow: hidden;
+  touch-action: none;
+}
+
+.phaserOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  padding: max(12px, env(safe-area-inset-top)) 10px max(12px, env(safe-area-inset-bottom));
+  background: rgba(9, 13, 10, 0.72);
+}
+
+.phaserPanel {
+  width: min(100%, 760px);
+  max-height: 96svh;
+  display: grid;
+  gap: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(215, 180, 106, 0.58);
+  background: #17231d;
+  color: #fff8e9;
+  padding: 10px;
+}
+
+.phaserHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.phaserHeader h2,
+.phaserHeader p {
+  margin: 0;
+}
+
+.phaserHeader h2 {
+  font-size: 1.05rem;
+}
+
+.phaserHeader p {
+  color: #ead9b9;
+  font-size: 0.86rem;
+}
+
+.phaserHeader button,
+.phaserFallback button {
+  min-width: 56px;
+  min-height: 44px;
+}
+
+.phaserHost {
+  width: 100%;
+  aspect-ratio: 720 / 520;
+  max-height: 70svh;
+  touch-action: none;
+}
+
+.phaserHost canvas {
+  max-width: 100%;
+  max-height: 100%;
+  display: block;
+}
+
+.phaserLoading,
+.phaserFallback {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+}
