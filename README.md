@@ -1,11 +1,12 @@
 # Escape Atelier
 
-React + TypeScript + Vite で作る、スマートフォン縦画面向けの静止画クリック型脱出ゲームシリーズです。
+React + TypeScript + Vite + Phaser 3 で実装する、スマートフォン縦画面向けの静止画クリック型脱出ゲームシリーズです。
 
 収録作品:
 
 - Escape Atelier #001 音楽室からの脱出
 - Escape Atelier #002 黄昏の温室からの脱出
+- Escape Atelier #003 星降る天文台からの脱出
 
 ## 起動
 
@@ -14,7 +15,7 @@ npm install
 npm run dev
 ```
 
-## ビルド・確認
+## 確認
 
 ```bash
 npm run lint
@@ -22,90 +23,114 @@ npm run test
 npm run build
 ```
 
-## 作品選択
+## 作品選択とセーブ
 
-`src/app/SeriesApp.tsx` がシリーズ選択を担当します。第1作は既存の `GameProvider` と `App` をそのまま利用し、第2作は `GreenhouseProvider` と `GreenhouseApp` で独立して起動します。
+`src/app/SeriesApp.tsx` がシリーズ選択画面です。#001 は既存の `GameProvider`、#002 は `GreenhouseProvider`、#003 は `ObservatoryProvider` で独立して起動します。
 
-セーブキーは分離しています。
+作品別セーブキー:
 
 - #001: `escape-atelier-001-save`
 - #002: `escape-atelier-002-save`
+- #003: `escape-atelier-003-save`
 
-## 第2作の構成
+#003 のセーブバージョンは `src/games/escape-atelier-003/data/gameConfig.ts` の `OBSERVATORY_SAVE_VERSION` で管理します。破損 JSON、旧バージョン、不正な area/scene/item/star/rotation/globe position は `state/saveService.ts` で初期値へ復旧します。
 
-第2作のデータと進行処理は `src/games/escape-atelier-002` に集約しています。
+## 第3作の概要
 
-- `data/gameConfig.ts`: 作品情報、保存キー、保存バージョン
-- `data/scenes.ts`: 温室ホットスポットと調査画面
+Escape Atelier #003 星降る天文台からの脱出は、洋館最上階の天文台を舞台にした 2階層探索型の脱出ゲームです。下階には望遠鏡、天球儀、星時計、机、星座図、月の模型、螺旋階段があり、上階には天窓、観測用の小窓、星時計上部機構があります。
+
+基本フロー:
+
+1. 星座盤の破片を3つ集める
+2. Phaser の星座盤修復パズルで修復した星座盤を得る
+3. React の月相パズルで真鍮の歯車を得る
+4. 歯車を星時計へ取り付ける
+5. Phaser の天球儀パズルで望遠鏡を解禁し、小さなレンズを得る
+6. レンズを望遠鏡へ取り付ける
+7. Phaser の望遠鏡パズルで3つの星を観測し、星の記録紙を得る
+8. Phaser の星座線パズルで星時計を起動する
+9. React の時刻入力で夜明けの鍵を得る
+10. 夜明けの鍵で天窓を開き、エンディングへ進む
+
+## 第3作の構成
+
+第3作は `src/games/escape-atelier-003` に閉じています。
+
+- `data/gameConfig.ts`: 作品情報、セーブキー、セーブバージョン
+- `data/scenes.ts`: 下階/上階ホットスポット、拡大シーン文言
 - `data/items.ts`: アイテム定義
-- `data/puzzles.ts`: 謎の正解、純粋判定関数
-- `data/hints.ts`: 3段階ヒント
-- `data/story.ts`: プロローグとエンディング
-- `state`: 第2作用 reducer、初期状態、localStorage 復旧処理
-- `puzzles`: Phaser で動く操作パズル
+- `data/puzzles.ts`: 月相、天球儀、星座盤、最終時刻の正解データと判定関数
+- `data/stars.ts`: 星の座標、観測対象、星座線の正解順
+- `data/hints.ts`: 進行状況に応じて出す3段階ヒント
+- `data/imageAssets.ts`: 画像パス
+- `state`: 初期状態、reducer、localStorage 復旧
+- `puzzles`: Phaser パズル4種
+- `ObservatoryApp.tsx`: React 側の探索、インベントリ、物語、時刻入力、エンディング
 
 ## React と Phaser の責務
 
-React はタイトル、プロローグ、探索、ホットスポット、インベントリ、設定、ヒント、色順入力、エンディング、保存を担当します。
+React が担当:
 
-Phaser は以下の操作系パズルだけで使用します。
+- 作品選択、タイトル、プロローグ、エンディング
+- 下階/上階探索、シーン切り替え、インベントリ
+- アイテム取得/使用、調査メッセージ、ヒント、設定
+- 月の満ち欠け、星時計表示、最終時刻入力
+- ゲーム全体の状態管理と localStorage 保存
 
-- 水差しの破片をドラッグして修復
-- 植木鉢をドラッグして並べ替え
-- 鏡をタップして光を反射
+Phaser が担当:
 
-共通ラッパーは `src/engine/phaser/PhaserPuzzle.tsx` です。Reactから初期状態を渡し、Phaserは `onStateChange` と `onComplete` で途中状態・完了状態をReactへ返します。Phaser内部だけに進行状態を保持しない方針です。
+- 星座盤のドラッグと90度回転
+- 天球儀の左右回転
+- 望遠鏡の視界移動と照準
+- 星同士を順番に結ぶ操作
 
-## Phaser パズルの追加方法
+共通ラッパーは `src/engine/phaser/PhaserPuzzle.tsx` です。React が保存済み状態を `initialState` として渡し、Phaser は `onStateChange` と `onComplete` で途中状態と完了状態を React へ返します。進行フラグや報酬付与は React reducer 側だけで行います。
 
-1. `src/games/<episode>/data/puzzles.ts` に正解と判定関数を追加します。
-2. `src/games/<episode>/puzzles/<puzzle-name>/config.ts` に `PhaserPuzzleConfigFactory<TState>` を実装します。
-3. React側で `<PhaserPuzzle />` を開き、`initialState`、`onCancel`、`onComplete` を接続します。
-4. 完了時の報酬付与と `SOLVE_PUZZLE` はReact reducer経由で実行します。
+## 第3作パズルデータの変更
 
-## 第2作の素材差し替え
+- 月相正解: `src/games/escape-atelier-003/data/puzzles.ts` の `moonPhaseOrder`
+- 天球儀正解位置: `correctGlobePosition`
+- 最終時刻: `dawnTimeAnswer`
+- 星の位置: `src/games/escape-atelier-003/data/stars.ts` の `telescopeStars`
+- 観測対象: `requiredObservedStarIds`
+- 星座線順序: `correctConstellationOrder`
+- 星座盤の正解スロット/角度: `plateTargets`
 
-第2作の画像参照は `src/games/escape-atelier-002/data/imageAssets.ts` にまとめています。公開時は `public/assets/escape-atelier-002/` に以下のようなファイルを配置できます。
+判定ロジックは同じファイルの純粋関数として分離しており、Vitest で確認しています。
+
+## 画像と音声の差し替え
+
+第3作の画像参照は `src/games/escape-atelier-003/data/imageAssets.ts` にまとめています。公開時は `public/assets/escape-atelier-003/` に以下のような WebP を置いてください。未配置でも `GameImage` のフォールバックと CSS 背景でゲーム進行は止まりません。
 
 - `title-bg.webp`
-- `greenhouse-main.webp`
-- `greenhouse-tree.webp`
-- `greenhouse-fountain.webp`
-- `greenhouse-door-open.webp`
+- `observatory-lower-main.webp`
+- `observatory-upper-main.webp`
+- `observatory-telescope.webp`
+- `observatory-celestial-globe.webp`
+- `observatory-star-clock.webp`
+- `observatory-skylight-open.webp`
 - `ending-bg.webp`
+- `item-plate-piece-01.webp` などのアイテム画像
 
-現状はCSSプレースホルダーとPhaser描画で進行できる仮実装です。画像が不足してもゲーム進行は停止しません。
-
-音声は第1作の `src/services/audioService.ts` の設計を再利用可能です。第2作用の音源名は後から `bgm-greenhouse-title.mp3`、`se-mirror-turn.mp3` などを追加する想定です。現状は未配置でも停止しません。
-
-## 正解・ホットスポット調整
-
-- 花の色順: `src/games/escape-atelier-002/data/puzzles.ts` の `flowerColorAnswer`
-- 植木鉢: `correctPotOrder`
-- 鏡角度: `mirrorDefinitions`
-- ホットスポット: `src/games/escape-atelier-002/data/scenes.ts` の `greenhouseHotspots`
-
-ホットスポット座標は画像全体に対するパーセント指定です。`VITE_DEBUG_HOTSPOTS=true` を使うとデバッグ表示を足しやすい構成です。
-
-## セーブデータのバージョン管理
-
-第2作の保存バージョンは `GREENHOUSE_SAVE_VERSION` で管理します。不正なJSON、古いバージョン、不明なIDは `state/saveService.ts` で初期状態へ復旧します。
-
-保存対象には、現在シーン、インベントリ、使用済みアイテム、調査済みポイント、解決済みパズル、フラグ、各Phaserパズルの途中状態、ヒント閲覧、設定、クリア状態を含みます。
+現状、第3作の音声ファイルは参照実装を追加していません。既存の音声管理を使う場合は、BGM/SE 名を作品データへ追加し、ファイル未配置時に失敗しない既存方針に合わせてください。
 
 ## GitHub Pages
 
-Vite の `base` は既存どおり環境変数で切り替えます。
+Vite の `base` は既存通り `VITE_BASE_PATH` で切り替えます。
 
 ```bash
 VITE_BASE_PATH=/repository-name/ npm run build
 ```
 
-外部ルーターに依存しない単一ページ構成なので、公開環境でのリロード404を避けやすい形です。
+外部ルーターに依存しない単一ページ構成なので、公開環境でのリロード 404 を避けやすい構成です。第3作の素材パスも `import.meta.env.BASE_URL` を通すため、GitHub Pages の base に追従します。
+
+## 第4作以降への流用
+
+#003 の構成をテンプレートにして、作品フォルダ内に `data`、`state`、`puzzles`、`<Episode>App.tsx` を追加してください。共通側へ追加するのは `SeriesApp.tsx` の登録だけにすると、既存作品のセーブや進行を壊しにくくなります。
 
 ## 既知の制約
 
-- 第2作の背景・アイテム画像は仮表示です。
-- 第2作の音源ファイルは未配置です。
-- Phaserパズルは初回実装として成立性を優先し、演出は控えめです。
-- 実機スマートフォンでは、ドラッグ時の指の隠れ方と縦画面でのキャンバス高さを追加確認してください。
+- 第3作の背景、アイテム、音声は仮素材前提です。
+- Phaser パズルは図形描画で成立するようにしており、演出は控えめです。
+- 実機スマートフォンでは、320px 幅、ドラッグ中スクロール、タップ対象サイズ、長文表示、画面回転を追加確認してください。
+- build 時に Phaser の静的 import によるチャンクサイズ警告が出ます。既存の第2作も同じ構成で Phaser を静的 import しているため、今回は挙動維持を優先しています。

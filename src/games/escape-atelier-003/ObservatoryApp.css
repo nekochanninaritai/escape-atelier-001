@@ -1,0 +1,290 @@
+.obsTitle,
+.obsStory,
+.obsShell {
+  min-height: 100svh;
+  color: #fff6dc;
+  background: #0d1328;
+  font-family: system-ui, sans-serif;
+}
+
+.obsBackdropImage,
+.obsStageImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.obsTitle,
+.obsStory {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  padding: max(18px, env(safe-area-inset-top)) 16px max(22px, env(safe-area-inset-bottom));
+}
+
+.obsTitle::before,
+.obsStory::before,
+.obsStage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 70% 18%, rgba(255, 226, 160, 0.2), transparent 18%),
+    linear-gradient(180deg, rgba(9, 14, 34, 0.35), rgba(9, 14, 34, 0.92));
+  pointer-events: none;
+}
+
+.obsTitleText,
+.obsStoryText {
+  position: relative;
+  width: min(520px, 100%);
+  padding: 24px 18px;
+  border: 1px solid rgba(214, 182, 109, 0.62);
+  background: rgba(10, 16, 36, 0.74);
+  backdrop-filter: blur(4px);
+  text-align: center;
+}
+
+.obsTitleText h1,
+.obsStoryText h1 {
+  margin: 8px 0 18px;
+  font-size: clamp(1.65rem, 8vw, 3rem);
+  letter-spacing: 0;
+}
+
+.obsTitleText h1 span {
+  display: block;
+  margin-top: 10px;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.obsButtons,
+.obsBottom,
+.obsConfirm {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+}
+
+.obsButtons button,
+.obsBottom button,
+.obsHeader button,
+.obsFocus button,
+.obsInventory button,
+.obsConfirm button,
+.obsHints button,
+.timePuzzle button {
+  min-height: 42px;
+  border: 1px solid rgba(214, 182, 109, 0.8);
+  border-radius: 6px;
+  color: #fff6dc;
+  background: #24365f;
+  font-weight: 700;
+}
+
+.obsButtons button,
+.obsBottom button,
+.obsHeader button,
+.obsFocus button,
+.obsConfirm button,
+.obsHints button,
+.timePuzzle button {
+  padding: 9px 14px;
+}
+
+.obsButtons button:disabled {
+  opacity: 0.45;
+}
+
+.obsShell {
+  display: grid;
+  grid-template-rows: auto minmax(360px, 1fr) auto auto;
+  gap: 10px;
+  padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom));
+}
+
+.obsHeader {
+  display: grid;
+  grid-template-columns: 72px 1fr 72px;
+  align-items: center;
+  gap: 8px;
+}
+
+.obsHeader div {
+  text-align: center;
+}
+
+.obsHeader span {
+  display: block;
+  color: #c8ccd6;
+  font-size: 0.75rem;
+}
+
+.obsHeader strong {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.obsStage {
+  position: relative;
+  overflow: hidden;
+  min-height: 360px;
+  border: 1px solid rgba(214, 182, 109, 0.6);
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 28% 22%, rgba(246, 241, 212, 0.16), transparent 10%),
+    linear-gradient(160deg, #0d1328, #24365f 62%, #2b1f3d);
+  touch-action: manipulation;
+}
+
+.obsStage.period-predawn {
+  background: linear-gradient(160deg, #162348, #4b3f6a 60%, #d99d74);
+}
+
+.obsStage h2 {
+  position: relative;
+  margin: 14px;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.65);
+}
+
+.obsHotspot {
+  position: absolute;
+  border: 1px solid rgba(255, 246, 220, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 246, 220, 0.04);
+}
+
+.obsHotspot:focus-visible,
+.obsButtons button:focus-visible,
+.obsBottom button:focus-visible,
+.obsHeader button:focus-visible,
+.obsInventory button:focus-visible {
+  outline: 3px solid #fff1a8;
+  outline-offset: 2px;
+}
+
+.obsFocus {
+  position: relative;
+  width: min(92%, 520px);
+  margin: 44px auto 0;
+  padding: 16px;
+  border: 1px solid rgba(214, 182, 109, 0.66);
+  border-radius: 8px;
+  background: rgba(10, 16, 36, 0.78);
+}
+
+.obsFocus p,
+.obsStoryText p {
+  line-height: 1.75;
+}
+
+.obsInventory {
+  display: flex;
+  gap: 8px;
+  min-height: 78px;
+  overflow-x: auto;
+  padding: 8px;
+  border: 1px solid rgba(200, 204, 214, 0.28);
+  border-radius: 8px;
+  background: rgba(10, 16, 36, 0.82);
+}
+
+.obsInventory p {
+  margin: auto;
+  color: #c8ccd6;
+}
+
+.obsInventory button {
+  flex: 0 0 86px;
+  padding: 6px;
+  font-size: 0.72rem;
+}
+
+.obsInventory button.selected {
+  box-shadow: 0 0 0 3px rgba(255, 241, 168, 0.45) inset;
+}
+
+.obsInventory img {
+  display: block;
+  width: 40px;
+  height: 40px;
+  margin: 0 auto 3px;
+  object-fit: contain;
+}
+
+.moonCards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+
+.moonCards button.selected {
+  background: #5a4d77;
+}
+
+.starClock {
+  display: grid;
+  place-items: center;
+  width: 150px;
+  height: 150px;
+  margin: 12px auto;
+  border: 4px solid #d6b66d;
+  border-radius: 50%;
+  background: rgba(13, 19, 40, 0.9);
+}
+
+.starClock span {
+  font-size: 1.8rem;
+  font-weight: 800;
+}
+
+.timePuzzle {
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+}
+
+.timePuzzle div {
+  display: grid;
+  grid-template-columns: 72px 70px 72px;
+  align-items: center;
+  gap: 8px;
+}
+
+.timePuzzle strong {
+  font-size: 1.8rem;
+  text-align: center;
+}
+
+.obsHints,
+.obsSettings {
+  display: grid;
+  gap: 12px;
+}
+
+@media (max-width: 430px) {
+  .obsShell {
+    grid-template-rows: auto minmax(330px, 1fr) auto auto;
+  }
+
+  .obsHeader {
+    grid-template-columns: 60px 1fr 60px;
+  }
+
+  .obsHeader button {
+    padding-inline: 6px;
+    font-size: 0.78rem;
+  }
+
+  .obsFocus {
+    width: calc(100% - 20px);
+    margin-top: 34px;
+    padding: 12px;
+  }
+}
