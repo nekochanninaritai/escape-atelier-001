@@ -1,21 +1,21 @@
 import type { ObservatoryHotspot } from '../types';
 
 export const lowerHotspots: ObservatoryHotspot[] = [
-  { id: 'telescope', label: '大型望遠鏡', x: 8, y: 23, width: 28, height: 33, targetScene: 'telescope' },
-  { id: 'celestial-globe', label: '天球儀', x: 58, y: 32, width: 25, height: 24, targetScene: 'celestial-globe' },
-  { id: 'star-clock', label: '星時計', x: 38, y: 15, width: 20, height: 28, targetScene: 'star-clock' },
-  { id: 'desk', label: '書き物机', x: 8, y: 62, width: 28, height: 24, targetScene: 'desk' },
-  { id: 'constellation-wall', label: '星座図の壁', x: 66, y: 8, width: 25, height: 22, targetScene: 'constellation-wall' },
-  { id: 'moon-model', label: '月の模型', x: 41, y: 56, width: 23, height: 22, targetScene: 'moon-model' },
-  { id: 'staircase', label: '螺旋階段', x: 72, y: 56, width: 24, height: 34, targetScene: 'staircase' },
+  { id: 'telescope', label: '大型望遠鏡', x: 15, y: 18, width: 31, height: 39, targetScene: 'telescope' },
+  { id: 'celestial-globe', label: '天球儀', x: 68, y: 41, width: 23, height: 28, targetScene: 'celestial-globe' },
+  { id: 'star-clock', label: '星時計', x: 42, y: 13, width: 18, height: 28, targetScene: 'star-clock' },
+  { id: 'desk', label: '書き物机', x: 1, y: 55, width: 34, height: 35, targetScene: 'desk' },
+  { id: 'constellation-wall', label: '星座図の壁', x: 68, y: 12, width: 27, height: 29, targetScene: 'constellation-wall' },
+  { id: 'moon-model', label: '月の模型', x: 40, y: 61, width: 27, height: 21, targetScene: 'moon-model' },
+  { id: 'staircase', label: '螺旋階段', x: 86, y: 7, width: 14, height: 73, targetScene: 'staircase' },
 ];
 
 export const upperHotspots: ObservatoryHotspot[] = [
-  { id: 'skylight', label: '天窓', x: 28, y: 8, width: 42, height: 28, targetScene: 'skylight' },
-  { id: 'upper-telescope', label: '望遠鏡上部', x: 8, y: 38, width: 30, height: 24, targetScene: 'telescope' },
-  { id: 'observation-window', label: '観測用の小窓', x: 62, y: 38, width: 26, height: 22, targetScene: 'constellation-wall' },
-  { id: 'upper-clock', label: '星時計の上部機構', x: 39, y: 41, width: 21, height: 20, targetScene: 'star-clock' },
-  { id: 'stairs-down', label: '下階へ戻る螺旋階段', x: 68, y: 65, width: 27, height: 26, targetScene: 'staircase' },
+  { id: 'skylight', label: '天窓', x: 10, y: 0, width: 80, height: 27, targetScene: 'skylight' },
+  { id: 'upper-telescope', label: '望遠鏡上部', x: 6, y: 24, width: 27, height: 36, targetScene: 'telescope' },
+  { id: 'observation-window', label: '観測用の小窓', x: 77, y: 34, width: 18, height: 18, targetScene: 'constellation-wall' },
+  { id: 'upper-clock', label: '星時計の上部機構', x: 41, y: 29, width: 19, height: 25, targetScene: 'star-clock' },
+  { id: 'stairs-down', label: '下階へ戻る螺旋階段', x: 75, y: 55, width: 22, height: 34, targetScene: 'staircase' },
 ];
 
 export const sceneCopy = {

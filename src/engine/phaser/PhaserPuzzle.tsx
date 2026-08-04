@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type Phaser from 'phaser';
+import Phaser from 'phaser';
 import type { PhaserPuzzleConfigFactory } from './types';
 import './PhaserPuzzle.css';
 
@@ -31,7 +31,6 @@ export function PhaserPuzzle<TState>({ title, instructions, initialState, create
     const boot = async () => {
       try {
         if (!hostRef.current || gameRef.current) return;
-        const PhaserModule = await import('phaser');
         if (cancelled) return;
         const config = createConfig({
           initialState,
@@ -44,13 +43,13 @@ export function PhaserPuzzle<TState>({ title, instructions, initialState, create
             onComplete(state);
           },
         });
-        gameRef.current = new PhaserModule.Game({
+        gameRef.current = new Phaser.Game({
           ...config,
-          type: PhaserModule.AUTO,
+          type: Phaser.AUTO,
           parent: hostRef.current,
           scale: {
-            mode: PhaserModule.Scale.FIT,
-            autoCenter: PhaserModule.Scale.CENTER_BOTH,
+            mode: Phaser.Scale.FIT,
+            autoCenter: Phaser.Scale.CENTER_BOTH,
             width: 720,
             height: 520,
           },
