@@ -2,8 +2,8 @@ import { SAVE_KEY, SAVE_VERSION } from '../data/gameConfig';
 import { initialState } from '../reducers/initialState';
 import type { GameState, ItemId, PuzzleId, SceneId } from '../types/game';
 
-const scenes: SceneId[] = ['title', 'prologue', 'room', 'piano', 'clock', 'desk', 'bookshelf', 'musicBox', 'door', 'ending'];
-const items: ItemId[] = ['sheetPiece1', 'sheetPiece2', 'sheetPiece3', 'windingKey', 'completedSheet', 'doorKey'];
+const scenes: SceneId[] = ['title', 'prologue', 'room', 'piano', 'clock', 'desk', 'bookshelf', 'globe', 'musicBox', 'door', 'ending'];
+const items: ItemId[] = ['sheetPiece1', 'sheetPiece2', 'sheetPiece3', 'combinedPaper', 'windingKey', 'completedSheet', 'doorKey'];
 const puzzles: PuzzleId[] = ['sheetOrder', 'clockMusicBox', 'pianoMelody'];
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;

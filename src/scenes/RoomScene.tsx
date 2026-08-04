@@ -5,7 +5,7 @@ import { roomHotspots } from '../data/scenes';
 import { useGame } from '../context/useGame';
 
 export function RoomScene({ onSettings, onHints }: { onSettings: () => void; onHints: () => void }) {
-  const { dispatch, showMessage } = useGame();
+  const { state, dispatch, showMessage } = useGame();
 
   return (
     <GameShell onSettings={onSettings} onHints={onHints}>
@@ -17,8 +17,18 @@ export function RoomScene({ onSettings, onHints }: { onSettings: () => void; onH
         hotspots={roomHotspots}
         onHotspot={(hotspot) => {
           dispatch({ type: 'INSPECT', pointId: hotspot.id });
-          if (hotspot.targetScene) dispatch({ type: 'GO_SCENE', scene: hotspot.targetScene });
-          else showMessage('気になる場所だ。');
+
+          if (hotspot.id === 'globe' && !state.flags.globeMarkSeen && !state.flags.windingKeyObtained) {
+            showMessage('古い地球儀だ。特に変わったところはなさそうだ。');
+            return;
+          }
+
+          if (hotspot.targetScene) {
+            dispatch({ type: 'GO_SCENE', scene: hotspot.targetScene });
+            return;
+          }
+
+          showMessage('気になる場所だ。');
         }}
       >
         <div className="stageLabel">夕暮れの音楽室</div>

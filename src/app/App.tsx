@@ -13,7 +13,7 @@ import { audioService } from '../services/audioService';
 import { preloadImages } from '../services/preloadService';
 import type { SceneId } from '../types/game';
 
-const focusScenes: SceneId[] = ['piano', 'clock', 'desk', 'bookshelf', 'musicBox', 'door'];
+const focusScenes: SceneId[] = ['piano', 'clock', 'desk', 'bookshelf', 'globe', 'musicBox', 'door'];
 
 export function App() {
   const { state } = useGame();
@@ -42,6 +42,7 @@ export function App() {
       preloadImages([
         imageAssets.rooms.piano,
         imageAssets.rooms.bookshelf,
+        imageAssets.rooms.globe,
         imageAssets.rooms.clock,
         imageAssets.rooms.desk,
         imageAssets.rooms.musicBox,

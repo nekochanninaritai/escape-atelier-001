@@ -126,3 +126,37 @@ node scripts/prepare-assets.mjs
 ```
 
 The script converts the latest generated background PNGs from Codex image generation into optimized WebP scene assets and regenerates procedural transparent WebP item/puzzle assets.
+
+## Added Paper And Globe Flow Assets
+
+### `item-combined-paper-front.webp`
+- Use: inventory detail front side of the paper made from fragments A/B/C
+- Size: 768 x 768
+- Format: WebP
+- Reference: the three fragment item images
+- Implementation: `imageAssets.items.combinedPaperFront`, `InventoryBar`
+- Note: this paper is not the piano melody clue.
+
+### `item-combined-paper-back.webp`
+- Use: inventory detail back side after tapping the flip button
+- Size: 768 x 768
+- Format: WebP
+- Reference: `item-combined-paper-front.webp`
+- Implementation: `imageAssets.items.combinedPaperBack`, `InventoryBar`
+- Difference: the back side shows a clear globe mark; first view sets `globeMarkSeen`.
+
+### `room-globe.webp`
+- Use: globe close-up scene
+- Size: 1080 x 1920
+- Format: WebP
+- Reference: `room-main.webp`, bookshelf/globe area
+- Implementation: `imageAssets.rooms.globe`, `FocusScene`
+- Prompt summary: antique globe on the same music-room bookshelf, brass stand, warm sunset light, no readable text.
+
+### `room-globe-open.webp`
+- Use: globe opened state after seeing the paper-back mark
+- Size: 1080 x 1920
+- Format: WebP
+- Reference: `room-globe.webp`
+- Implementation: `imageAssets.rooms.globeOpen`, `FocusScene`
+- Difference: same antique globe; only the brass base opens and reveals the small music-box winding key.

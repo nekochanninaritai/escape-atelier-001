@@ -73,11 +73,76 @@
   background: linear-gradient(180deg, #fff8e6, #d8caa4);
   border-color: #4d3b27;
   align-self: stretch;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 3px;
+}
+
+.pianoKeys strong {
+  font-size: clamp(0.92rem, 4vw, 1.18rem);
+  line-height: 1;
+}
+
+.pianoKeys span {
+  font-size: 0.68rem;
+  color: #6c5130;
 }
 
 .tinyText {
   font-size: 0.86rem;
   color: #d9c995;
+}
+
+.scaleBook {
+  display: grid;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid rgba(216, 190, 111, 0.54);
+  border-radius: 6px;
+  background: rgba(255, 246, 221, 0.1);
+}
+
+.scaleBook p {
+  font-size: 0.86rem;
+  color: #f5df9c;
+}
+
+.scaleStaff {
+  position: relative;
+  height: 92px;
+  border-radius: 4px;
+  background:
+    linear-gradient(#ead39b 0 0) 0 22px / 100% 2px no-repeat,
+    linear-gradient(#ead39b 0 0) 0 34px / 100% 2px no-repeat,
+    linear-gradient(#ead39b 0 0) 0 46px / 100% 2px no-repeat,
+    linear-gradient(#ead39b 0 0) 0 58px / 100% 2px no-repeat,
+    linear-gradient(#ead39b 0 0) 0 70px / 100% 2px no-repeat,
+    rgba(32, 22, 16, 0.44);
+}
+
+.scaleStaff span {
+  position: absolute;
+  width: 32px;
+  transform: translateX(-50%);
+  text-align: center;
+}
+
+.scaleStaff i {
+  display: block;
+  width: 18px;
+  height: 13px;
+  margin: 0 auto 10px;
+  border-radius: 50%;
+  background: #f7efd9;
+  transform: rotate(-18deg);
+}
+
+.scaleStaff b {
+  display: block;
+  color: #fff7dd;
+  font-size: 0.72rem;
+  line-height: 1;
 }
 
 .puzzleBox label {

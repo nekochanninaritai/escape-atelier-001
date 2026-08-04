@@ -4,6 +4,13 @@
   gap: 6px;
 }
 
+.assembleButton {
+  width: 100%;
+  margin-top: 6px;
+  border-color: #d7be6e;
+  background: linear-gradient(180deg, #285044, #1b302a);
+}
+
 .inventorySlot {
   min-height: 66px;
   border: 1px solid #705a36;
@@ -72,8 +79,43 @@
 }
 
 .largeItemIcon {
-  width: 96px;
-  height: 96px;
+  width: min(78vw, 320px);
+  aspect-ratio: 1;
+  height: auto;
   border-radius: 8px;
   background: rgba(255, 246, 221, 0.06);
+}
+
+.largeItemIcon img {
+  object-fit: contain;
+}
+
+.paperCard {
+  perspective: 800px;
+  animation: paperFlip 260ms ease;
+}
+
+.paperCardBack {
+  animation-name: paperFlipBack;
+}
+
+.flipButton {
+  min-width: min(72vw, 220px);
+}
+
+@keyframes paperFlip {
+  from { transform: rotateY(-10deg) scale(0.98); opacity: 0.72; }
+  to { transform: rotateY(0) scale(1); opacity: 1; }
+}
+
+@keyframes paperFlipBack {
+  from { transform: rotateY(10deg) scale(0.98); opacity: 0.72; }
+  to { transform: rotateY(0) scale(1); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .paperCard,
+  .paperCardBack {
+    animation: none;
+  }
 }

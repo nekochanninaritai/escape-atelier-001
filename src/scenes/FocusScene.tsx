@@ -7,7 +7,7 @@ import { items } from '../data/items';
 import { puzzles } from '../data/puzzles';
 import { useGame } from '../context/useGame';
 import { audioService } from '../services/audioService';
-import type { ItemId, SceneId } from '../types/game';
+import type { Hotspot, ItemId, SceneId } from '../types/game';
 import './FocusScene.css';
 
 type FocusSceneProps = {
@@ -17,29 +17,61 @@ type FocusSceneProps = {
 };
 
 const fragmentIds: ItemId[] = ['sheetPiece1', 'sheetPiece2', 'sheetPiece3'];
-const pianoKeys = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
+const pianoKeys = [
+  { note: 'C', solfege: 'ド' },
+  { note: 'D', solfege: 'レ' },
+  { note: 'E', solfege: 'ミ' },
+  { note: 'F', solfege: 'ファ' },
+  { note: 'G', solfege: 'ソ' },
+  { note: 'A', solfege: 'ラ' },
+  { note: 'B', solfege: 'シ' },
+];
+const noteNames = Object.fromEntries(pianoKeys.map((key) => [key.note, key.solfege]));
+
+const bookshelfHotspots: Hotspot[] = [
+  { id: 'bookshelf-globe', label: '地球儀', x: 40.5, y: 41.5, width: 18, height: 13.5, targetScene: 'globe' },
+];
 
 const sceneCopy: Record<string, { title: string; description: string; variant: string }> = {
-  piano: { title: 'ピアノ', description: '古いグランドピアノだ。鍵盤の一部に、かすかな傷がある。', variant: 'piano' },
-  clock: { title: '古時計', description: '長い間、止まったままの時計だ。音符の記号が数字の代わりに並んでいる。', variant: 'clock' },
-  desk: { title: '机', description: '深い色の木でできた机。引き出しには小さな鍵穴がある。', variant: 'desk' },
-  bookshelf: { title: '本棚', description: '音楽史や古い楽譜の本が並んでいる。', variant: 'bookshelf' },
-  musicBox: { title: 'オルゴール', description: '小さなオルゴール。ゼンマイが外れている。', variant: 'musicBox' },
-  door: { title: '出口の扉', description: '重い木の扉。鍵が掛かっている。', variant: 'door' },
-};
-
-const puzzlePieceImages: Record<ItemId, string> = {
-  sheetPiece1: imageAssets.puzzles.sheetPiece01,
-  sheetPiece2: imageAssets.puzzles.sheetPiece02,
-  sheetPiece3: imageAssets.puzzles.sheetPiece03,
-  windingKey: imageAssets.items.windingKey,
-  completedSheet: imageAssets.puzzles.completeSheet,
-  doorKey: imageAssets.items.doorKey,
+  piano: {
+    title: 'ピアノ',
+    description: '古いグランドピアノだ。そばに、音階の練習帳が置かれている。',
+    variant: 'piano',
+  },
+  clock: {
+    title: '古時計',
+    description: '長い間、止まったままの時計だ。音楽記号が数字の代わりに並んでいる。',
+    variant: 'clock',
+  },
+  desk: {
+    title: '机',
+    description: '深い艶の木でできた机。引き出しには細い傷がある。',
+    variant: 'desk',
+  },
+  bookshelf: {
+    title: '本棚',
+    description: '音楽史や古い楽譜の本が並んでいる。棚の中には古い地球儀も見える。',
+    variant: 'bookshelf',
+  },
+  globe: {
+    title: '地球儀',
+    description: '本棚に置かれた古い地球儀だ。真鍮の台座が鈍く光っている。',
+    variant: 'globe',
+  },
+  musicBox: {
+    title: 'オルゴール',
+    description: '小さなオルゴール。側面に小さな穴がある。',
+    variant: 'musicBox',
+  },
+  door: {
+    title: '出口の扉',
+    description: '重い木の扉。鍵が掛かっている。',
+    variant: 'door',
+  },
 };
 
 export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
   const { state, dispatch, showMessage } = useGame();
-  const [sheetOrder, setSheetOrder] = useState<ItemId[]>([]);
   const [clockAnswer, setClockAnswer] = useState('');
   const [pianoInput, setPianoInput] = useState<string[]>([]);
   const [confirmDoor, setConfirmDoor] = useState(false);
@@ -49,20 +81,24 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
   const solved = useMemo(() => new Set(state.solvedPuzzles), [state.solvedPuzzles]);
   const sceneImage = (() => {
     if (sceneId === 'desk' && solved.has('sheetOrder')) return imageAssets.rooms.deskOpen;
+    if (sceneId === 'globe' && state.flags.globeOpened) return imageAssets.rooms.globeOpen;
     if (sceneId === 'musicBox' && state.flags.musicBoxPlayed) return imageAssets.rooms.musicBoxActive;
     if (sceneId === 'piano' && solved.has('pianoMelody')) return imageAssets.rooms.pianoOpen;
     if (sceneId === 'door' && state.isCleared) return imageAssets.rooms.doorOpen;
     if (sceneId === 'piano') return imageAssets.rooms.piano;
     if (sceneId === 'clock') return imageAssets.rooms.clock;
     if (sceneId === 'bookshelf') return imageAssets.rooms.bookshelf;
+    if (sceneId === 'globe') return imageAssets.rooms.globe;
     if (sceneId === 'musicBox') return imageAssets.rooms.musicBox;
     if (sceneId === 'door') return imageAssets.rooms.door;
     return imageAssets.rooms.desk;
   })();
 
   const collect = (itemId: ItemId, message: string) => {
-    dispatch({ type: 'COLLECT_ITEM', itemId });
-    audioService.playSe('item', state.settings);
+    if (!state.collectedItems.includes(itemId)) {
+      dispatch({ type: 'COLLECT_ITEM', itemId });
+      audioService.playSe('item', state.settings);
+    }
     showMessage(message);
   };
 
@@ -72,38 +108,45 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
     else showMessage(emptyMessage);
   };
 
-  const toggleSheetPiece = (itemId: ItemId) => {
-    setSheetOrder((current) => {
-      if (current.includes(itemId)) return current.filter((id) => id !== itemId);
-      return [...current, itemId];
-    });
-  };
+  const inspectGlobe = () => {
+    dispatch({ type: 'INSPECT', pointId: 'globe-base' });
 
-  const submitSheetPuzzle = () => {
-    const puzzle = puzzles.sheetOrder;
-    if (sheetOrder.join(',') !== puzzle.answer.join(',')) {
-      audioService.playSe('fail', state.settings);
-      showMessage(puzzle.failureMessage);
-      setSheetOrder([]);
+    if (state.flags.windingKeyObtained || state.collectedItems.includes('windingKey')) {
+      dispatch({ type: 'SET_FLAG', key: 'globeOpened', value: true });
+      showMessage('地球儀の台座は開いている。中にはもう何もない。');
       return;
     }
-    dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'sheetOrder' });
-    collect('windingKey', '隠された引き出しから、オルゴールのゼンマイを手に入れた。');
-    showMessage(puzzle.successMessage);
+
+    if (!state.flags.globeMarkSeen) {
+      showMessage('古い地球儀だ。特に変わったところはなさそうだ。');
+      return;
+    }
+
+    dispatch({ type: 'SET_FLAG', key: 'globeOpened', value: true });
+    dispatch({ type: 'SET_FLAG', key: 'windingKeyObtained', value: true });
+    collect('windingKey', '地球儀の台座に、小さなゼンマイが隠されていた。');
   };
 
-  const useMusicBox = () => {
+  const handleMusicBox = (forceUse = false) => {
     if (state.flags.musicBoxPlayed) {
-      showMessage('オルゴールは「♪、月、扉」の順に小さく光った。');
+      showMessage('オルゴールは「月、星、鳥」の順に小さく光っている。');
       return;
     }
-    if (state.selectedItemId !== 'windingKey') {
-      showMessage(state.selectedItemId ? 'ここでは使えないようだ。' : 'ゼンマイがあれば動かせそうだ。');
+
+    const hasWindingKey = state.inventory.includes('windingKey');
+    if (!hasWindingKey) {
+      showMessage('側面に小さな穴がある。何かを取り付けられそうだ。');
       return;
     }
+
+    if (!forceUse && state.selectedItemId && state.selectedItemId !== 'windingKey') {
+      showMessage('ここでは使えないようだ。');
+      return;
+    }
+
     dispatch({ type: 'USE_ITEM', itemId: 'windingKey', consume: true });
     dispatch({ type: 'SET_FLAG', key: 'musicBoxPlayed', value: true });
-    showMessage('オルゴールが動き出し、「♪、月、扉」の順に光った。');
+    showMessage('オルゴールが動き出し、「月、星、鳥」の順に淡く光った。');
   };
 
   const submitClockPuzzle = () => {
@@ -115,15 +158,16 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
       return;
     }
     dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'clockMusicBox' });
-    collect('completedSheet', '完成した楽譜を手に入れた。');
-    showMessage(puzzle.successMessage);
+    dispatch({ type: 'SET_FLAG', key: 'sheetMarkedByClock', value: true });
+    collect('completedSheet', puzzle.successMessage);
   };
 
   const pressPianoKey = (note: string) => {
     if (!state.inventory.includes('completedSheet')) {
-      showMessage('今はまだ、どの順に弾けばよいか分からない。');
+      showMessage('まだピアノを弾く手掛かりが足りない。');
       return;
     }
+
     const next = [...pianoInput, note];
     setPianoInput(next);
     audioService.playSe('tap', state.settings);
@@ -154,9 +198,27 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
     setConfirmDoor(true);
   };
 
+  const handleFocusHotspot = (hotspot: Hotspot) => {
+    dispatch({ type: 'INSPECT', pointId: hotspot.id });
+
+    if (hotspot.id === 'bookshelf-globe' && !state.flags.globeMarkSeen && !state.flags.windingKeyObtained) {
+      showMessage('古い地球儀だ。特に変わったところはなさそうだ。');
+      return;
+    }
+
+    if (hotspot.targetScene) dispatch({ type: 'GO_SCENE', scene: hotspot.targetScene });
+  };
+
   return (
     <GameShell onBack={() => dispatch({ type: 'GO_SCENE', scene: 'room' })} onSettings={onSettings} onHints={onHints}>
-      <ImageStage label={copy.title} variant={copy.variant} src={sceneImage} alt={`${copy.title}の拡大画像`}>
+      <ImageStage
+        label={copy.title}
+        variant={copy.variant}
+        src={sceneImage}
+        alt={`${copy.title}の拡大画像`}
+        hotspots={sceneId === 'bookshelf' ? bookshelfHotspots : []}
+        onHotspot={handleFocusHotspot}
+      >
         <div className="focusPanel">
           <h2>{copy.title}</h2>
           <p>{copy.description}</p>
@@ -166,22 +228,7 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
               <button type="button" onClick={() => inspectForFragment('desk-fragment', 'sheetPiece1', '机の上には、もう目新しいものはない。')}>
                 机を調べる
               </button>
-              {hasAllFragments && !solved.has('sheetOrder') && (
-                <div className="puzzleBox">
-                  <h3>{puzzles.sheetOrder.title}</h3>
-                  <p>{puzzles.sheetOrder.prompt}</p>
-                  <div className="choiceRow">
-                    {fragmentIds.map((itemId) => (
-                      <button key={itemId} type="button" className={sheetOrder.includes(itemId) ? 'chosen' : ''} onClick={() => toggleSheetPiece(itemId)}>
-                        <img src={puzzlePieceImages[itemId]} alt={items[itemId].alt} draggable={false} />
-                        {items[itemId].name.replace('楽譜の切れ端 ', '')}
-                      </button>
-                    ))}
-                  </div>
-                  <p>選択: {sheetOrder.map((id) => items[id].name.replace('楽譜の切れ端 ', '')).join(' → ') || 'なし'}</p>
-                  <button type="button" onClick={submitSheetPuzzle}>並べる</button>
-                </div>
-              )}
+              {hasAllFragments && !solved.has('sheetOrder') && <p>すべての切れ端がそろった。インベントリからつなぎ合わせられそうだ。</p>}
             </div>
           )}
 
@@ -191,19 +238,39 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
             </button>
           )}
 
+          {sceneId === 'globe' && (
+            <div className={state.flags.globeOpened ? 'drawer drawerOpen' : 'drawer'}>
+              <button type="button" onClick={inspectGlobe}>
+                地球儀を調べる
+              </button>
+            </div>
+          )}
+
           {sceneId === 'piano' && (
             <>
               <button type="button" onClick={() => inspectForFragment('piano-fragment', 'sheetPiece3', 'ピアノ周りは静かだ。')}>
                 ピアノ周りを調べる
               </button>
+              <div className="scaleBook" aria-label="音階の練習帳">
+                <p>音階の練習帳</p>
+                <div className="scaleStaff">
+                  {pianoKeys.map((key, index) => (
+                    <span key={key.note} style={{ left: `${8 + index * 14}%`, bottom: `${12 + index * 9}%` }}>
+                      <i />
+                      <b>{key.solfege}</b>
+                    </span>
+                  ))}
+                </div>
+              </div>
               <div className="pianoKeys" aria-label="ピアノ鍵盤">
-                {pianoKeys.map((note) => (
-                  <button key={note} type="button" onClick={() => pressPianoKey(note)} aria-label={`${note}の鍵盤`}>
-                    {note}
+                {pianoKeys.map((key) => (
+                  <button key={key.note} type="button" onClick={() => pressPianoKey(key.note)} aria-label={`${key.solfege}の鍵盤`}>
+                    <strong>{key.solfege}</strong>
+                    <span>{key.note}</span>
                   </button>
                 ))}
               </div>
-              <p className="tinyText">入力: {pianoInput.join(' ') || 'なし'}</p>
+              <p className="tinyText">入力: {pianoInput.map((note) => noteNames[note]).join('・') || 'なし'}</p>
             </>
           )}
 
@@ -214,17 +281,20 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
                 <span className="clockHand hourHand" />
                 <span className="clockHand minuteHand" />
               </div>
-              <p>時計盤には 1=月、3=♪、4=扉 と刻まれている。</p>
+              <p>時計盤には 1=月、3=星、4=鳥 と刻まれている。</p>
               {state.flags.musicBoxPlayed && !solved.has('clockMusicBox') && (
                 <>
                   <label>
                     答え
                     <input inputMode="numeric" value={clockAnswer} maxLength={3} onChange={(event) => setClockAnswer(event.target.value.replace(/\D/g, ''))} />
                   </label>
-                  <button type="button" onClick={submitClockPuzzle}>確かめる</button>
+                  <button type="button" onClick={submitClockPuzzle}>
+                    確かめる
+                  </button>
                 </>
               )}
-              {solved.has('clockMusicBox') && <p>楽譜の欠けていた旋律は、もう読める。</p>}
+              {!state.flags.musicBoxPlayed && <p>今はまだ、どの記号を読むべきか分からない。</p>}
+              {solved.has('clockMusicBox') && <p>完成した楽譜には、淡い金色の音符が並んでいる。</p>}
             </div>
           )}
 
@@ -232,11 +302,16 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
             <>
               {state.flags.musicBoxPlayed && (
                 <div className="musicBoxClue">
-                  <img src={imageAssets.puzzles.musicBoxClue} alt="オルゴールから現れた金属プレート" draggable={false} />
-                  <span aria-label="オルゴールの手掛かり">♪ 月 扉</span>
+                  <img src={imageAssets.puzzles.musicBoxClue} alt="オルゴールから現れた金属のプレート" draggable={false} />
+                  <span aria-label="オルゴールの手掛かり">星 月 鳥</span>
                 </div>
               )}
-              <button type="button" onClick={useMusicBox}>
+              {!state.flags.musicBoxPlayed && state.inventory.includes('windingKey') && (
+                <button type="button" onClick={() => handleMusicBox(true)}>
+                  ゼンマイを使う
+                </button>
+              )}
+              <button type="button" onClick={() => handleMusicBox(false)}>
                 オルゴールを調べる
               </button>
             </>
@@ -252,7 +327,9 @@ export function FocusScene({ sceneId, onSettings, onHints }: FocusSceneProps) {
       {confirmDoor && (
         <Modal title="古い鍵を使いますか？" onClose={() => setConfirmDoor(false)}>
           <div className="confirmActions">
-            <button type="button" onClick={() => setConfirmDoor(false)}>やめる</button>
+            <button type="button" onClick={() => setConfirmDoor(false)}>
+              やめる
+            </button>
             <button
               type="button"
               onClick={() => {

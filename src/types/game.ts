@@ -6,11 +6,19 @@ export type SceneId =
   | 'clock'
   | 'desk'
   | 'bookshelf'
+  | 'globe'
   | 'musicBox'
   | 'door'
   | 'ending';
 
-export type ItemId = 'sheetPiece1' | 'sheetPiece2' | 'sheetPiece3' | 'windingKey' | 'completedSheet' | 'doorKey';
+export type ItemId =
+  | 'sheetPiece1'
+  | 'sheetPiece2'
+  | 'sheetPiece3'
+  | 'combinedPaper'
+  | 'windingKey'
+  | 'completedSheet'
+  | 'doorKey';
 
 export type PuzzleId = 'sheetOrder' | 'clockMusicBox' | 'pianoMelody';
 
