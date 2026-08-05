@@ -5,6 +5,14 @@ import type { GlobePosition } from '../../types';
 
 type GlobeState = { positionId: GlobePosition };
 
+const globePositionLabels: Record<GlobePosition, string> = {
+  north: '北',
+  east: '東',
+  south: '南',
+  west: '西',
+  target: '天頂',
+};
+
 export const createCelestialGlobePuzzleConfig: PhaserPuzzleConfigFactory<GlobeState> = (callbacks) => ({
   scene: new CelestialGlobeScene(callbacks),
   backgroundColor: '#10172f',
@@ -23,11 +31,12 @@ class CelestialGlobeScene extends Phaser.Scene {
 
   create() {
     this.add.text(360, 30, '天球儀を固定位置へ合わせる', { color: '#fff6dc', fontSize: '22px' }).setOrigin(0.5);
+    this.add.text(360, 64, '修復した星座盤の銀の印は「天頂」を指している', { color: '#dfe8ff', fontSize: '18px' }).setOrigin(0.5);
     this.add.circle(360, 235, 130, 0x1a2b54, 1).setStrokeStyle(5, 0xd6b66d, 0.9);
     for (let index = 0; index < 26; index += 1) {
       this.add.circle(250 + ((index * 53) % 230), 130 + ((index * 37) % 210), 2 + (index % 3), 0xf4f1d4, 0.65);
     }
-    this.label = this.add.text(360, 235, this.positionId.toUpperCase(), { color: '#fff6dc', fontSize: '34px', fontStyle: 'bold' }).setOrigin(0.5);
+    this.label = this.add.text(360, 235, globePositionLabels[this.positionId], { color: '#fff6dc', fontSize: '34px', fontStyle: 'bold' }).setOrigin(0.5);
     this.addButton(230, 445, '←', () => this.step(-1));
     this.addButton(490, 445, '→', () => this.step(1));
     this.addButton(360, 445, '確認', () => this.check());
@@ -45,7 +54,7 @@ class CelestialGlobeScene extends Phaser.Scene {
   private step(delta: number) {
     const index = globePositions.indexOf(this.positionId);
     this.positionId = globePositions[(index + delta + globePositions.length) % globePositions.length];
-    this.label?.setText(this.positionId.toUpperCase());
+    this.label?.setText(globePositionLabels[this.positionId]);
     this.callbacks.onStateChange({ positionId: this.positionId });
   }
 

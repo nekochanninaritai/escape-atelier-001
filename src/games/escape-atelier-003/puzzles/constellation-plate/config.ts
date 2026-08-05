@@ -4,9 +4,9 @@ import { isCorrectPlatePiece, normalizePlateRotation, plateTargets } from '../..
 import type { ConstellationPlatePuzzleState } from '../../types';
 
 const pieces = [
-  { id: 'piece1', label: 'I', slotId: 'left', x: 255, y: 270, startX: 150, startY: 420, color: 0xb89455 },
-  { id: 'piece2', label: 'II', slotId: 'top', x: 360, y: 190, startX: 360, startY: 420, color: 0xc8ccd6 },
-  { id: 'piece3', label: 'III', slotId: 'right', x: 465, y: 270, startX: 570, startY: 420, color: 0xd4a95f },
+  { id: 'piece1', label: 'I', slotId: 'left', x: 255, y: 270, startX: 150, startY: 420, color: 0xb89455, clue: '左' },
+  { id: 'piece2', label: 'II', slotId: 'top', x: 360, y: 190, startX: 360, startY: 420, color: 0xc8ccd6, clue: '上' },
+  { id: 'piece3', label: 'III', slotId: 'right', x: 465, y: 270, startX: 570, startY: 420, color: 0xd4a95f, clue: '右' },
 ] as const;
 
 export const createConstellationPlatePuzzleConfig: PhaserPuzzleConfigFactory<ConstellationPlatePuzzleState> = (callbacks) => ({
@@ -26,9 +26,26 @@ class ConstellationPlateScene extends Phaser.Scene {
 
   create() {
     this.add.text(360, 28, '破片を置き、90度ずつ回転させる', { color: '#fff6dc', fontSize: '22px' }).setOrigin(0.5);
+    this.add
+      .text(624, 28, 'リセット', { color: '#fff6dc', backgroundColor: '#4b3424', padding: { x: 12, y: 8 }, fontSize: '18px' })
+      .setOrigin(0.5)
+      .setInteractive({ useHandCursor: true })
+      .on('pointerdown', () => this.resetPuzzle());
     this.add.circle(360, 250, 130).setStrokeStyle(4, 0xd6b66d, 0.85);
     this.add.line(360, 250, -100, 0, 100, 0, 0xc8ccd6, 0.5);
     this.add.line(360, 250, 0, -100, 0, 100, 0xc8ccd6, 0.5);
+
+    pieces.forEach((piece) => {
+      const target = plateTargets[piece.id];
+      this.add.rectangle(piece.x, piece.y, 106, 88, 0x0b1024, 0.2).setStrokeStyle(2, piece.color, 0.75);
+      this.add.text(piece.x, piece.y - 54, `${piece.clue} ${piece.label}`, { color: '#fff6dc', fontSize: '17px', fontStyle: 'bold' }).setOrigin(0.5);
+      const angle = Phaser.Math.DegToRad(target.rotation - 90);
+      const tipX = piece.x + Math.cos(angle) * 34;
+      const tipY = piece.y + Math.sin(angle) * 34;
+      this.add.line(piece.x, piece.y, 0, 0, tipX - piece.x, tipY - piece.y, piece.color, 0.9).setLineWidth(4, 4);
+      this.add.circle(tipX, tipY, 7, piece.color, 0.95);
+      this.add.text(piece.x, piece.y + 54, `${target.rotation}°`, { color: '#dfe8ff', fontSize: '15px' }).setOrigin(0.5);
+    });
 
     pieces.forEach((piece) => {
       const current = this.state.pieces[piece.id];
@@ -40,6 +57,8 @@ class ConstellationPlateScene extends Phaser.Scene {
       shape.rotation = Phaser.Math.DegToRad(current?.rotation ?? 0);
       const label = this.add.text(x, y, piece.label, { color: '#11172b', fontSize: '22px', fontStyle: 'bold' }).setOrigin(0.5);
       label.rotation = shape.rotation;
+      const marker = this.add.triangle(x, y - 31, 0, 14, 12, -10, -12, -10, 0x2a1830, 0.9);
+      marker.rotation = shape.rotation;
       if (!isPlaced) {
         shape.setInteractive({ draggable: true, useHandCursor: true });
         this.input.setDraggable(shape);
@@ -50,11 +69,13 @@ class ConstellationPlateScene extends Phaser.Scene {
         this.state = { pieces: { ...this.state.pieces, [piece.id]: { ...this.state.pieces[piece.id], rotation } } };
         shape.rotation = Phaser.Math.DegToRad(rotation);
         label.rotation = shape.rotation;
+        marker.rotation = shape.rotation;
         this.emitState();
       });
       shape.on('drag', (_pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
         shape.setPosition(dragX, dragY);
         label.setPosition(dragX, dragY);
+        marker.setPosition(dragX, dragY);
       });
       shape.on('dragend', () => {
         const distance = Phaser.Math.Distance.Between(shape.x, shape.y, piece.x, piece.y);
@@ -63,6 +84,7 @@ class ConstellationPlateScene extends Phaser.Scene {
         if (isCorrectPlatePiece(slotId, rotation, target.slotId, target.rotation)) {
           shape.setPosition(piece.x, piece.y).disableInteractive();
           label.setPosition(piece.x, piece.y);
+          marker.setPosition(piece.x, piece.y);
           this.state = { pieces: { ...this.state.pieces, [piece.id]: { placed: true, rotation, slotId } } };
           this.emitState();
           if (Object.values(this.state.pieces).every((entry) => entry.placed)) this.complete();
@@ -70,15 +92,27 @@ class ConstellationPlateScene extends Phaser.Scene {
         }
         this.state = { pieces: { ...this.state.pieces, [piece.id]: { ...this.state.pieces[piece.id], slotId: null } } };
         this.emitState();
-        this.tweens.add({ targets: [shape, label], x: piece.startX, y: piece.startY, duration: this.callbacks.reducedMotion ? 0 : 180 });
+        this.tweens.add({ targets: [shape, label, marker], x: piece.startX, y: piece.startY, duration: this.callbacks.reducedMotion ? 0 : 180 });
       });
     });
 
-    this.add.text(360, 492, 'タップで回転。正しい位置と角度で吸着します。', { color: '#dfe8ff', fontSize: '18px' }).setOrigin(0.5);
+    this.add.text(360, 492, '枠の記号と角度に合わせると吸着します。', { color: '#dfe8ff', fontSize: '18px' }).setOrigin(0.5);
   }
 
   private emitState() {
     this.callbacks.onStateChange(this.state);
+  }
+
+  private resetPuzzle() {
+    this.state = {
+      pieces: {
+        piece1: { placed: false, rotation: 0, slotId: null },
+        piece2: { placed: false, rotation: 0, slotId: null },
+        piece3: { placed: false, rotation: 0, slotId: null },
+      },
+    };
+    this.emitState();
+    this.scene.restart();
   }
 
   private complete() {

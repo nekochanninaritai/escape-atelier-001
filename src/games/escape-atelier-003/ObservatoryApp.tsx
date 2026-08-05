@@ -209,7 +209,7 @@ export function ObservatoryApp({ onSeriesSelect }: { onSeriesSelect: () => void 
       {hintsOpen && <ObservatoryHints onClose={() => setHintsOpen(false)} />}
       {confirmSkylight && <ConfirmSkylight onCancel={() => setConfirmSkylight(false)} onOpen={() => { dispatch({ type: 'USE_ITEM', itemId: 'dawnKey', consume: true }); dispatch({ type: 'CLEAR_GAME' }); }} />}
       {puzzle === 'plate' && <PhaserPuzzle title="星座盤の修復" instructions="破片をドラッグし、タップで90度回転させてください。" initialState={state.puzzleStates.constellationPlate} createConfig={createConstellationPlatePuzzleConfig} onCancel={(nextState) => { dispatch({ type: 'SET_PLATE_STATE', state: nextState }); setPuzzle(null); }} onComplete={(nextState) => { dispatch({ type: 'SET_PLATE_STATE', state: nextState }); dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'constellationPlate' }); dispatch({ type: 'SET_FLAG', key: 'constellationPlateRepaired', value: true }); dispatch({ type: 'REMOVE_ITEMS', itemIds: ['platePiece1', 'platePiece2', 'platePiece3'] }); dispatch({ type: 'COLLECT_ITEM', itemId: 'constellationPlate' }); setPuzzle(null); showMessage('星座盤が修復された。'); }} />}
-      {puzzle === 'globe' && <PhaserPuzzle title="天球儀" instructions="左右へ動かし、星座盤の示す位置に合わせてください。" initialState={state.puzzleStates.celestialGlobe} createConfig={createCelestialGlobePuzzleConfig} onCancel={(nextState) => { dispatch({ type: 'SET_GLOBE_POSITION', positionId: nextState.positionId }); setPuzzle(null); }} onComplete={(nextState) => { dispatch({ type: 'SET_GLOBE_POSITION', positionId: nextState.positionId }); dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'celestialGlobe' }); dispatch({ type: 'SET_FLAG', key: 'celestialGlobeAligned', value: true }); dispatch({ type: 'SET_FLAG', key: 'telescopeUnlocked', value: true }); setPuzzle(null); showMessage('天球儀の星が柔らかく光り、小さな収納が開いた。'); }} />}
+      {puzzle === 'globe' && <PhaserPuzzle title="天球儀" instructions="左右へ動かし、星座盤の示す位置に合わせてください。" initialState={state.puzzleStates.celestialGlobe} createConfig={createCelestialGlobePuzzleConfig} onCancel={(nextState) => { dispatch({ type: 'SET_GLOBE_POSITION', positionId: nextState.positionId }); setPuzzle(null); }} onComplete={(nextState) => { dispatch({ type: 'SET_GLOBE_POSITION', positionId: nextState.positionId }); dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'celestialGlobe' }); dispatch({ type: 'SET_FLAG', key: 'celestialGlobeAligned', value: true }); dispatch({ type: 'SET_FLAG', key: 'telescopeUnlocked', value: true }); dispatch({ type: 'COLLECT_ITEM', itemId: 'smallLens' }); setPuzzle(null); showMessage('天球儀の星が柔らかく光り、小さなレンズを手に入れた。'); }} />}
       {puzzle === 'telescope' && <PhaserPuzzle title="望遠鏡の観測" instructions="視界を動かし、照準の中央で観測してください。" initialState={state.puzzleStates.telescope} createConfig={createTelescopePuzzleConfig} onCancel={(nextState) => { dispatch({ type: 'SET_TELESCOPE_STATE', state: nextState }); setPuzzle(null); }} onComplete={(nextState) => { dispatch({ type: 'SET_TELESCOPE_STATE', state: nextState }); dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'telescope' }); dispatch({ type: 'SET_FLAG', key: 'allStarsObserved', value: true }); dispatch({ type: 'COLLECT_ITEM', itemId: 'starRecord' }); setPuzzle(null); showMessage('三つの星を観測し、星の記録紙が完成した。'); }} />}
       {puzzle === 'lines' && <PhaserPuzzle title="星座を結ぶ" instructions="観測した星を記録紙の順番で選んでください。" initialState={state.puzzleStates.constellationLines} createConfig={createConstellationLinesPuzzleConfig} onCancel={(nextState) => { dispatch({ type: 'SET_CONSTELLATION_LINES', selectedStarIds: nextState.selectedStarIds }); setPuzzle(null); }} onComplete={(nextState) => { dispatch({ type: 'SET_CONSTELLATION_LINES', selectedStarIds: nextState.selectedStarIds }); dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'constellationLines' }); dispatch({ type: 'SET_FLAG', key: 'constellationConnected', value: true }); dispatch({ type: 'SET_FLAG', key: 'starClockStarted', value: true }); setPuzzle(null); showMessage(`星時計が動き出し、夜明けの時刻 ${dawnTimeAnswer} を示した。`); }} />}
     </main>
@@ -223,7 +223,7 @@ function FocusPanel({ sceneId, onAction, onMoonSolved }: { sceneId: ObservatoryS
   return (
     <div className="obsFocus">
       <h2>{copy.title}</h2>
-      <p>{copy.description}</p>
+      <p>{getFocusDescription(sceneId, state, copy.description)}</p>
       {sceneId === 'moon-model' && !state.solvedPuzzles.includes('moonPhases') ? <MoonPuzzle onSolved={onMoonSolved} /> : null}
       {sceneId === 'star-clock' && state.flags.starClockStarted ? <StarClock /> : null}
       {sceneId === 'skylight' && state.flags.starClockStarted && !state.flags.dawnTimeSolved ? <DawnTimePuzzle onSolved={() => {
@@ -236,6 +236,24 @@ function FocusPanel({ sceneId, onAction, onMoonSolved }: { sceneId: ObservatoryS
       <button type="button" onClick={onAction}>調べる / 使う</button>
     </div>
   );
+}
+
+function getFocusDescription(sceneId: ObservatorySceneId, state: ObservatoryGameState, fallback: string) {
+  if (sceneId === 'star-clock') {
+    if (state.flags.starClockStarted) return `星時計は静かに動き、夜明けの時刻 ${dawnTimeAnswer} を示している。`;
+    if (state.flags.starClockGearInstalled) return '歯車は取り付けられたが、時計盤はまだ完全には動かない。星の記録が必要なようだ。';
+  }
+  if (sceneId === 'telescope' && state.flags.telescopeLensInstalled) {
+    return '小さなレンズが収まり、望遠鏡の視界が澄んでいる。星を観測できそうだ。';
+  }
+  if (sceneId === 'celestial-globe' && state.inventory.includes('constellationPlate')) {
+    return '修復した星座盤の銀の印は、東西南北のどれでもなく天頂を示している。';
+  }
+  if (sceneId === 'skylight') {
+    if (state.isCleared) return '開いた天窓の向こうに、淡い朝焼けが広がっている。';
+    if (state.flags.dawnTimeSolved) return '夜明けの光が天窓の縁を照らしている。星形の鍵穴が見える。';
+  }
+  return fallback;
 }
 
 function MoonPuzzle({ onSolved }: { onSolved: () => void }) {
