@@ -57,7 +57,7 @@ export function GreenhouseApp({ onSeriesSelect }: { onSeriesSelect: () => void }
       else if (state.inventory.includes('flowerSeed') && state.selectedItemId === 'flowerSeed' && !state.flags.seedPlanted) {
         dispatch({ type: 'USE_ITEM', itemId: 'flowerSeed', consume: true });
         dispatch({ type: 'SET_FLAG', key: 'seedPlanted', value: true });
-        showMessage('花の種を、よく日に当たる鉢へ植えた。');
+        showMessage('花の種を、よく日に当たる鉢へ植えた。芽から花へ育つ順に鉢が反応しそうだ。');
       } else if (state.flags.seedPlanted && !solved.has('plantPots')) setPuzzle('plantPots');
       else showMessage(state.flags.seedPlanted ? '鉢の並びを整えられそうだ。' : '種を植えられそうな鉢がある。');
       return;
@@ -82,7 +82,7 @@ export function GreenhouseApp({ onSeriesSelect }: { onSeriesSelect: () => void }
         dispatch({ type: 'SET_FLAG', key: 'plantWatered', value: true });
         dispatch({ type: 'SET_FLAG', key: 'flowersBloomed', value: true });
         showMessage('花が青、白、赤、黄の順に咲いた。');
-      } else if (state.flags.flowersBloomed && !solved.has('flowerColors')) showMessage('咲いた花の順番を入力できそうだ。');
+      } else if (state.flags.flowersBloomed && !solved.has('flowerColors')) showMessage('枝先には青、白、赤、黄の花が咲いた跡が順に残っている。入力できそうだ。');
       else if (state.flags.treeBloomed && !state.collectedItems.includes('butterflyKey')) collect('butterflyKey', '開いた花の中から蝶の鍵が現れた。');
       else showMessage('大樹はまだ光と水を待っている。');
       return;

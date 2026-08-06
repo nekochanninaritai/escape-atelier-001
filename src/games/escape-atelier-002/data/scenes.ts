@@ -12,7 +12,7 @@ export const greenhouseHotspots: GreenhouseHotspot[] = [
 
 export const sceneCopy: Record<Exclude<GreenhouseSceneId, 'title' | 'prologue' | 'greenhouse' | 'ending'>, { title: string; description: string }> = {
   tree: { title: '中央の大樹', description: '夕暮れの光を失い、枝先の花は固く閉じている。' },
-  pots: { title: '植木鉢棚', description: '大きさも葉の形も違う鉢が並ぶ棚。土はまだ柔らかい。' },
+  pots: { title: '植木鉢棚', description: '大きさも葉の形も違う鉢が並ぶ棚。棚板には「芽から花へ」と書かれた古い成長記録が残っている。土はまだ柔らかい。' },
   fountain: { title: '噴水', description: '水面は静かだが、奥からかすかな水音が聞こえる。' },
   workbench: { title: '作業机', description: '園芸道具と古い陶器の欠片が散らばっている。' },
   mirrorDevice: { title: '鏡の装置', description: '真鍮の支柱が夕日の角度を待っている。' },
