@@ -33,7 +33,7 @@ export function SeriesApp() {
   if (episode === '002') {
     return (
       <GreenhouseProvider>
-        <GreenhouseApp />
+        <GreenhouseApp onSeriesSelect={() => selectEpisode('series')} />
       </GreenhouseProvider>
     );
   }
@@ -41,7 +41,7 @@ export function SeriesApp() {
   if (episode === '003') {
     return (
       <ObservatoryProvider>
-        <ObservatoryApp />
+        <ObservatoryApp onSeriesSelect={() => selectEpisode('series')} />
       </ObservatoryProvider>
     );
   }
