@@ -294,10 +294,23 @@
 
 .studyBottom {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   padding: 10px 12px max(10px, env(safe-area-inset-bottom));
   background: #140f0d;
+}
+
+.studyBottom span {
+  display: inline-grid;
+  min-width: 22px;
+  min-height: 22px;
+  place-items: center;
+  margin-left: 4px;
+  border-radius: 999px;
+  color: #2b1712;
+  background: #f0ce7a;
+  font-size: 0.78rem;
+  font-weight: 700;
 }
 
 .studyHints,

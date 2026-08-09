@@ -1,4 +1,4 @@
-export const STUDY_SAVE_VERSION = 1;
+export const STUDY_SAVE_VERSION = 2;
 export const STUDY_SAVE_KEY = 'escape-atelier-004-save';
 export const DEBUG_STUDY_HOTSPOTS = import.meta.env.VITE_DEBUG_HOTSPOTS === 'true';
 
@@ -13,6 +13,10 @@ export const studyGameConfig = {
   saveVersion: STUDY_SAVE_VERSION,
   startScene: 'title',
   clearScene: 'ending',
+  features: {
+    notebook: true,
+    investigationLog: true,
+  },
   assets: {
     images: [
       'title-bg.webp',

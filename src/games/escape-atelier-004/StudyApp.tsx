@@ -1,15 +1,19 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+﻿import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { GameImage } from '../../components/common/GameImage';
 import { Modal } from '../../components/common/Modal';
 import { ItemDetailModal } from '../../engine/inventory/ItemDetailModal';
 import { findCombineRule, normalizeInventory, resolveItemDefinition } from '../../engine/inventory/inventoryUtils';
+import { NotebookModal } from '../../engine/notebook/NotebookModal';
+import { getUnreadClueCount } from '../../engine/notebook/notebookUtils';
 import { PhaserPuzzle } from '../../engine/phaser/PhaserPuzzle';
 import { studyGameConfig } from './gameConfig';
+import { studyClues } from './data/clues';
 import { studyHints } from './data/hints';
 import { studyImages } from './data/imageAssets';
 import { studyItemCombineRules } from './data/itemCombineRules';
 import { studyItems } from './data/items';
 import { isCorrectTypewriterCode } from './data/puzzles';
+import { resolveInvestigationMessage, studyInvestigationTargetLabels } from './data/investigationTargets';
 import { sceneCopy, studyHotspots } from './data/scenes';
 import { endingPages, prologuePages } from './data/story';
 import { createDiaryRestorePuzzleConfig } from './puzzles/diary-restore/config';
@@ -30,9 +34,12 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
   const [endingPage, setEndingPage] = useState(0);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [hintsOpen, setHintsOpen] = useState(false);
+  const [notebookOpen, setNotebookOpen] = useState(false);
   const [puzzle, setPuzzle] = useState<PuzzleOverlay>(null);
   const [confirmDoor, setConfirmDoor] = useState(false);
   const solved = useMemo(() => new Set(state.solvedPuzzles), [state.solvedPuzzles]);
+  const notebookData = { clues: state.notebook.clues, investigationLog: state.investigationLog.entries };
+  const unreadClues = getUnreadClueCount(notebookData);
   const stageImage = getStageImage(state.currentScene, state);
 
   useEffect(() => {
@@ -45,6 +52,14 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
   const collect = (itemId: StudyItemId, text: string) => {
     dispatch({ type: 'ACQUIRE_ITEM', itemId });
     showMessage(text);
+  };
+  const discoverClue = (clueId: string) => {
+    if (!studyClues[clueId] || state.notebook.clues.some((clue) => clue.clueId === clueId)) return;
+    dispatch({ type: 'DISCOVER_CLUE', clueId });
+    showMessage(`ノートに記録しました: ${studyClues[clueId].title}`);
+  };
+  const recordInvestigation = (targetId: string) => {
+    dispatch({ type: 'RECORD_INVESTIGATION', targetId, message: resolveInvestigationMessage(targetId, state.flags) });
   };
 
   const handleSceneAction = () => {
@@ -181,6 +196,8 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
                 style={{ left: `${hotspot.x}%`, top: `${hotspot.y}%`, width: `${hotspot.width}%`, height: `${hotspot.height}%` }}
                 onClick={() => {
                   dispatch({ type: 'INSPECT', pointId: hotspot.id });
+                  recordInvestigation(hotspot.id);
+                  if (hotspot.clueIdOnInspect) discoverClue(hotspot.clueIdOnInspect);
                   if (hotspot.targetScene) go(hotspot.targetScene);
                 }}
                 aria-label={hotspot.label}
@@ -192,10 +209,25 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
         )}
       </section>
       <Inventory />
-      <nav className="studyBottom"><button type="button" onClick={() => setHintsOpen(true)}>ヒント</button><button type="button" onClick={() => setSettingsOpen(true)}>設定</button></nav>
+      <nav className="studyBottom">
+        <button type="button" onClick={() => setNotebookOpen(true)} aria-label={`ノートを開く。未読 ${unreadClues} 件`}>
+          ノート {unreadClues > 0 ? <span>{unreadClues}</span> : null}
+        </button>
+        <button type="button" onClick={() => setHintsOpen(true)}>ヒント</button>
+        <button type="button" onClick={() => setSettingsOpen(true)}>設定</button>
+      </nav>
       {message && <div className="messageToast">{message}</div>}
       {settingsOpen && <StudySettings onClose={() => setSettingsOpen(false)} />}
       {hintsOpen && <StudyHints onClose={() => setHintsOpen(false)} />}
+      {notebookOpen && (
+        <NotebookModal
+          data={notebookData}
+          definitions={studyClues}
+          targetLabels={studyInvestigationTargetLabels}
+          onClose={() => setNotebookOpen(false)}
+          onMarkRead={(clueId) => dispatch({ type: 'MARK_CLUE_READ', clueId })}
+        />
+      )}
       {confirmDoor && <ConfirmDoor onCancel={() => setConfirmDoor(false)} onOpen={() => { dispatch({ type: 'USE_ITEM_ON_TARGET', itemId: 'study-key', targetId: 'exit-door' }); dispatch({ type: 'CLEAR_GAME' }); }} />}
       {puzzle === 'diary' && (
         <PhaserPuzzle
@@ -209,6 +241,8 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
             dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'diaryRestore' });
             dispatch({ type: 'SET_FLAG', key: 'diaryRestored', value: true });
             dispatch({ type: 'SET_FLAG', key: 'globeUnlocked', value: true });
+            dispatch({ type: 'DISCOVER_CLUE', clueId: 'diary-restored' });
+            dispatch({ type: 'RECORD_INVESTIGATION', targetId: 'diary-restore', message: '日記のページを復元した。' });
             setPuzzle(null);
             showMessage('日記が春から冬へつながった。地球儀の留め具が小さく鳴った。');
           }}
@@ -241,6 +275,9 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
             dispatch({ type: 'SET_PAPER_OVERLAY', state: nextState });
             dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'paperOverlay' });
             dispatch({ type: 'SET_FLAG', key: 'paperAligned', value: true });
+            dispatch({ type: 'DISCOVER_CLUE', clueId: 'overlay-result' });
+            dispatch({ type: 'ACQUIRE_ITEM', itemId: 'overlay-clue' });
+            dispatch({ type: 'RECORD_INVESTIGATION', targetId: 'paper-overlay', message: '半透明の紙を重ね、文字を読んだ。' });
             setPuzzle(null);
             showMessage('欠けた文字が重なり、REMEMBER という言葉が読めるようになった。');
           }}
@@ -290,6 +327,14 @@ function Inventory() {
     else showMessage('この二つは組み合わせられないようだ。');
     setDetailItem(null);
   };
+  const openDetail = (itemId: StudyItemId) => {
+    const item = studyItems[itemId];
+    if (item.clueIdOnInspect && !state.notebook.clues.some((clue) => clue.clueId === item.clueIdOnInspect)) {
+      dispatch({ type: 'DISCOVER_CLUE', clueId: item.clueIdOnInspect });
+      showMessage(`ノートに記録しました: ${studyClues[item.clueIdOnInspect]?.title ?? item.name}`);
+    }
+    setDetailItem(itemId);
+  };
 
   return (
     <>
@@ -306,7 +351,7 @@ function Inventory() {
                 <span>{item.name}</span>
                 {entry.isUsed ? <em>使用済み</em> : null}
               </button>
-              <button type="button" className="studyDetailButton" onClick={() => setDetailItem(itemId)} aria-label={`${item.name}の詳細`}>i</button>
+              <button type="button" className="studyDetailButton" onClick={() => openDetail(itemId)} aria-label={`${item.name}の詳細`}>i</button>
             </div>
           );
         })}
@@ -415,3 +460,4 @@ function hintTitle(id: StudyPuzzleId) {
   };
   return titles[id];
 }
+

@@ -1,4 +1,5 @@
 import type { InventoryItemState, ItemId, ItemStateId } from '../../../engine/inventory/types';
+import type { InvestigationLogEntry, ClueState } from '../../../engine/notebook/types';
 
 export type StudySceneId =
   | 'title'
@@ -83,6 +84,12 @@ export type StudyGameState = {
     typewriterCode: { input: string };
   };
   viewedHints: Record<string, number>;
+  notebook: {
+    clues: ClueState[];
+  };
+  investigationLog: {
+    entries: InvestigationLogEntry[];
+  };
   settings: StudySettings;
   isCleared: boolean;
 };
@@ -95,6 +102,7 @@ export type StudyHotspot = {
   width: number;
   height: number;
   targetScene?: StudySceneId;
+  clueIdOnInspect?: string;
 };
 
 export type StudyAction =
@@ -117,6 +125,10 @@ export type StudyAction =
   | { type: 'SET_PAPER_OVERLAY'; state: PaperOverlayState }
   | { type: 'SET_TYPEWRITER_INPUT'; input: string }
   | { type: 'VIEW_HINT'; puzzleId: StudyPuzzleId; level: number }
+  | { type: 'DISCOVER_CLUE'; clueId: string }
+  | { type: 'MARK_CLUE_READ'; clueId: string }
+  | { type: 'MARK_ALL_CLUES_READ' }
+  | { type: 'RECORD_INVESTIGATION'; targetId: string; message?: string }
   | { type: 'UPDATE_SETTINGS'; settings: Partial<StudySettings> }
   | { type: 'CLEAR_GAME' }
   | { type: 'RESET' };

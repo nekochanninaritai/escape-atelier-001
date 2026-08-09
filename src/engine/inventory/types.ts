@@ -20,6 +20,7 @@ export type ItemDefinition = {
   rotatable?: boolean;
   flippable?: boolean;
   zoomable?: boolean;
+  clueIdOnInspect?: string;
   initialState?: ItemStateId;
   states?: Record<ItemStateId, ItemDefinitionState>;
 };

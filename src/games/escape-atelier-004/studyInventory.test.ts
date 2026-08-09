@@ -37,4 +37,27 @@ describe('Escape Atelier #004 inventory state', () => {
     const heated = studyReducer(selected, { type: 'USE_ITEM_ON_TARGET', itemId: 'sealed-letter', targetId: 'fireplace' });
     expect(heated.selectedItemId).toBeNull();
   });
+
+  it('discovers clues once and marks them read', () => {
+    const discovered = studyReducer(studyInitialState, { type: 'DISCOVER_CLUE', clueId: 'opened-letter-directions' });
+    const duplicated = studyReducer(discovered, { type: 'DISCOVER_CLUE', clueId: 'opened-letter-directions' });
+    const read = studyReducer(duplicated, { type: 'MARK_CLUE_READ', clueId: 'opened-letter-directions' });
+    expect(duplicated.notebook.clues).toHaveLength(1);
+    expect(read.notebook.clues[0].isRead).toBe(true);
+  });
+
+  it('records investigation targets without duplicate target rows', () => {
+    const once = studyReducer(studyInitialState, { type: 'RECORD_INVESTIGATION', targetId: 'bookshelf', message: 'Checked.' });
+    const twice = studyReducer(once, { type: 'RECORD_INVESTIGATION', targetId: 'bookshelf', message: 'Checked again.' });
+    expect(twice.investigationLog.entries).toHaveLength(1);
+    expect(twice.investigationLog.entries[0].count).toBe(2);
+    expect(twice.investigationLog.entries[0].latestMessage).toBe('Checked again.');
+  });
+
+  it('ignores invalid clue and investigation ids', () => {
+    const clue = studyReducer(studyInitialState, { type: 'DISCOVER_CLUE', clueId: 'missing' });
+    const log = studyReducer(studyInitialState, { type: 'RECORD_INVESTIGATION', targetId: 'missing' });
+    expect(clue.notebook.clues).toEqual([]);
+    expect(log.investigationLog.entries).toEqual([]);
+  });
 });

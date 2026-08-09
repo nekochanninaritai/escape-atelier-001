@@ -1,12 +1,12 @@
 import type { StudyHotspot, StudySceneId } from '../types';
 
 export const studyHotspots: StudyHotspot[] = [
-  { id: 'bookshelf', label: '大きな本棚', x: 4, y: 14, width: 28, height: 58, targetScene: 'bookshelf' },
+  { id: 'bookshelf', label: '大きな本棚', x: 4, y: 14, width: 28, height: 58, targetScene: 'bookshelf', clueIdOnInspect: 'selected-book' },
   { id: 'desk', label: '書斎机', x: 34, y: 52, width: 30, height: 28, targetScene: 'desk' },
   { id: 'typewriter', label: 'タイプライター', x: 43, y: 40, width: 17, height: 16, targetScene: 'typewriter' },
   { id: 'fireplace', label: '暖炉', x: 67, y: 43, width: 26, height: 31, targetScene: 'fireplace' },
   { id: 'globe', label: '地球儀', x: 74, y: 18, width: 18, height: 24, targetScene: 'globe' },
-  { id: 'portrait', label: '肖像画', x: 39, y: 12, width: 21, height: 24, targetScene: 'portrait' },
+  { id: 'portrait', label: '肖像画', x: 39, y: 12, width: 21, height: 24, targetScene: 'portrait', clueIdOnInspect: 'portrait-clock' },
   { id: 'side-table', label: 'サイドテーブル', x: 10, y: 72, width: 19, height: 17, targetScene: 'side-table' },
   { id: 'door', label: '出口の扉', x: 0, y: 23, width: 10, height: 58, targetScene: 'door' },
 ];

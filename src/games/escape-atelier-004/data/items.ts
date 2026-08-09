@@ -37,6 +37,7 @@ export const studyItems: Record<StudyItemId, ItemDefinition> = {
     image: studyItemImages.sealedLetter,
     alt: '封じられた手紙',
     inspectable: true,
+    clueIdOnInspect: 'sealed-letter',
   },
   'heated-letter': {
     id: 'heated-letter',
@@ -45,6 +46,7 @@ export const studyItems: Record<StudyItemId, ItemDefinition> = {
     image: studyItemImages.heatedLetter,
     alt: '温めた手紙',
     inspectable: true,
+    clueIdOnInspect: 'opened-letter-directions',
   },
   'opened-letter': {
     id: 'opened-letter',
@@ -78,6 +80,7 @@ export const studyItems: Record<StudyItemId, ItemDefinition> = {
     alt: '暗号表',
     inspectable: true,
     zoomable: true,
+    clueIdOnInspect: 'cipher-table',
   },
   'transparent-sheet': {
     id: 'transparent-sheet',
@@ -97,6 +100,7 @@ export const studyItems: Record<StudyItemId, ItemDefinition> = {
     alt: 'タイプライターから出た紙',
     inspectable: true,
     zoomable: true,
+    clueIdOnInspect: 'typed-paper',
   },
   'overlay-clue': {
     id: 'overlay-clue',
@@ -105,6 +109,7 @@ export const studyItems: Record<StudyItemId, ItemDefinition> = {
     image: studyItemImages.overlayClue,
     alt: '重ね合わせた手がかり',
     inspectable: true,
+    clueIdOnInspect: 'overlay-result',
   },
   'study-key': {
     id: 'study-key',

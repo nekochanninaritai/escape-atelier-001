@@ -31,6 +31,12 @@ export const studyInitialState: StudyGameState = {
     typewriterCode: { input: '' },
   },
   viewedHints: {},
+  notebook: {
+    clues: [],
+  },
+  investigationLog: {
+    entries: [],
+  },
   completedCombineRules: [],
   completedUseRules: [],
   settings: {

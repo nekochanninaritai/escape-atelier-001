@@ -1,4 +1,7 @@
 import { applyCombineRule, applyItemUseRule, acquireInventoryItem, normalizeInventory, removeInventoryItem, selectInventoryItem, setInventoryItemState, transformInventoryItem } from '../../../engine/inventory/inventoryUtils';
+import { discoverClue, markAllCluesAsRead, markClueAsRead, recordInvestigation } from '../../../engine/notebook/notebookUtils';
+import { studyClues } from '../data/clues';
+import { studyInvestigationTargets } from '../data/investigationTargets';
 import { studyItemCombineRules } from '../data/itemCombineRules';
 import { studyItemUseRules } from '../data/itemUseRules';
 import { studyItems } from '../data/items';
@@ -29,6 +32,14 @@ function applyFlags(state: StudyGameState, flags: Record<string, boolean> | unde
     if (key in nextFlags) nextFlags[key as keyof StudyGameState['flags']] = value;
   });
   return { ...state, flags: nextFlags };
+}
+
+function notebookDataFromState(state: StudyGameState) {
+  return { clues: state.notebook.clues, investigationLog: state.investigationLog.entries };
+}
+
+function applyNotebookData(state: StudyGameState, data: ReturnType<typeof notebookDataFromState>): StudyGameState {
+  return { ...state, notebook: { clues: data.clues }, investigationLog: { entries: data.investigationLog } };
 }
 
 export function studyReducer(state: StudyGameState, action: StudyAction): StudyGameState {
@@ -85,6 +96,22 @@ export function studyReducer(state: StudyGameState, action: StudyAction): StudyG
       return { ...state, puzzleStates: { ...state.puzzleStates, typewriterCode: { input: action.input } } };
     case 'VIEW_HINT':
       return { ...state, viewedHints: { ...state.viewedHints, [action.puzzleId]: Math.max(state.viewedHints[action.puzzleId] ?? 0, action.level) } };
+    case 'DISCOVER_CLUE': {
+      const result = discoverClue(notebookDataFromState(state), studyClues, action.clueId);
+      return applyNotebookData(state, result.data);
+    }
+    case 'MARK_CLUE_READ': {
+      const result = markClueAsRead(notebookDataFromState(state), action.clueId);
+      return applyNotebookData(state, result.data);
+    }
+    case 'MARK_ALL_CLUES_READ': {
+      const result = markAllCluesAsRead(notebookDataFromState(state));
+      return applyNotebookData(state, result.data);
+    }
+    case 'RECORD_INVESTIGATION': {
+      const result = recordInvestigation(notebookDataFromState(state), studyInvestigationTargets, action.targetId, action.message);
+      return applyNotebookData(state, result.data);
+    }
     case 'UPDATE_SETTINGS':
       return { ...state, settings: { ...state.settings, ...action.settings } };
     case 'CLEAR_GAME':
