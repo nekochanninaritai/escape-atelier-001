@@ -1,10 +1,13 @@
+import { normalizeInventory } from '../../../engine/inventory/inventoryUtils';
+import type { InventoryEntry } from '../../../engine/inventory/types';
 import { STUDY_SAVE_KEY, STUDY_SAVE_VERSION } from '../gameConfig';
 import { diaryPageOrder, initialDiaryPageOrder, memoryRouteAnswer } from '../data/puzzles';
-import type { StudyGameState, StudyItemId, StudyPuzzleId, StudySceneId } from '../types';
+import { studyItems } from '../data/items';
+import type { StudyGameState, StudyPuzzleId, StudySceneId } from '../types';
+import { isStudyItemId } from '../types';
 import { studyInitialState } from './initialState';
 
 const scenes: StudySceneId[] = ['title', 'prologue', 'study', 'bookshelf', 'desk', 'typewriter', 'fireplace', 'globe', 'portrait', 'side-table', 'door', 'ending'];
-const items: StudyItemId[] = ['diaryPage', 'letterFragment', 'inkRibbon', 'transparentPaper', 'memoryKey'];
 const puzzles: StudyPuzzleId[] = ['diaryRestore', 'memoryGlobe', 'paperOverlay', 'typewriterCode'];
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === 'object' && value !== null;
@@ -18,6 +21,20 @@ function readFlags(value: unknown): StudyGameState['flags'] {
   ) as StudyGameState['flags'];
 }
 
+function readInventoryEntries(value: unknown): InventoryEntry[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((entry): InventoryEntry[] => {
+    if (typeof entry === 'string') return [entry];
+    if (!isRecord(entry) || typeof entry.itemId !== 'string') return [];
+    return [{
+      itemId: entry.itemId,
+      stateId: typeof entry.stateId === 'string' ? entry.stateId : undefined,
+      acquiredAt: typeof entry.acquiredAt === 'number' ? entry.acquiredAt : undefined,
+      isUsed: entry.isUsed === true,
+    }];
+  });
+}
+
 export function loadStudyState(): StudyGameState {
   try {
     const raw = window.localStorage.getItem(STUDY_SAVE_KEY);
@@ -29,14 +46,25 @@ export function loadStudyState(): StudyGameState {
     const globe = isRecord(puzzleStates.memoryGlobe) ? puzzleStates.memoryGlobe : {};
     const paper = isRecord(puzzleStates.paperOverlay) ? puzzleStates.paperOverlay : {};
     const typewriter = isRecord(puzzleStates.typewriterCode) ? puzzleStates.typewriterCode : {};
+    const normalizedInventory = normalizeInventory(
+      readInventoryEntries(parsed.inventory),
+      studyItems,
+      typeof parsed.selectedItemId === 'string' ? parsed.selectedItemId : null,
+      isRecord(parsed.itemStates) ? Object.fromEntries(Object.entries(parsed.itemStates).filter(([, stateId]) => typeof stateId === 'string')) as Record<string, string> : {},
+      Array.isArray(parsed.collectedItems) ? parsed.collectedItems.filter((itemId): itemId is string => typeof itemId === 'string') : [],
+      Array.isArray(parsed.usedItems) ? parsed.usedItems.filter((itemId): itemId is string => typeof itemId === 'string') : [],
+    );
 
     return {
       ...studyInitialState,
       currentScene: scenes.includes(parsed.currentScene as StudySceneId) ? (parsed.currentScene as StudySceneId) : 'title',
-      inventory: filterIds(parsed.inventory, items),
-      selectedItemId: items.includes(parsed.selectedItemId as StudyItemId) ? (parsed.selectedItemId as StudyItemId) : null,
-      collectedItems: filterIds(parsed.collectedItems, items),
-      usedItems: filterIds(parsed.usedItems, items),
+      inventory: normalizedInventory.inventory,
+      selectedItemId: normalizedInventory.selectedItemId && isStudyItemId(normalizedInventory.selectedItemId) ? normalizedInventory.selectedItemId : null,
+      itemStates: normalizedInventory.itemStates,
+      collectedItems: normalizedInventory.collectedItems.filter(isStudyItemId),
+      usedItems: normalizedInventory.usedItems.filter(isStudyItemId),
+      completedCombineRules: Array.isArray(parsed.completedCombineRules) ? parsed.completedCombineRules.filter((id): id is string => typeof id === 'string') : [],
+      completedUseRules: Array.isArray(parsed.completedUseRules) ? parsed.completedUseRules.filter((id): id is string => typeof id === 'string') : [],
       inspectedPoints: Array.isArray(parsed.inspectedPoints) ? parsed.inspectedPoints.filter((id): id is string => typeof id === 'string') : [],
       solvedPuzzles: filterIds(parsed.solvedPuzzles, puzzles),
       flags: readFlags(parsed.flags),

@@ -1,0 +1,38 @@
+.itemDetail {
+  display: grid;
+  gap: 12px;
+}
+
+.itemDetailImage {
+  width: min(100%, 260px);
+  aspect-ratio: 1;
+  justify-self: center;
+  border-radius: 8px;
+}
+
+.itemDetail p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.itemDetailActions,
+.itemCombineList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.itemDetailActions button,
+.itemCombineList button {
+  min-height: 44px;
+  border: 1px solid rgba(216, 181, 107, 0.72);
+  border-radius: 8px;
+  color: #fff7e8;
+  background: rgba(59, 38, 31, 0.92);
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.itemCombineList button:disabled {
+  opacity: 0.45;
+}

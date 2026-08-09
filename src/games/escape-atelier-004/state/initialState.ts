@@ -19,7 +19,11 @@ export const studyInitialState: StudyGameState = {
     typewriterReady: false,
     typewriterSolved: false,
     doorUnlocked: false,
+    letterHeated: false,
+    letterOpened: false,
+    inkRibbonInstalled: false,
   },
+  itemStates: {},
   puzzleStates: {
     diaryRestore: { pageOrder: [...initialDiaryPageOrder] },
     memoryGlobe: { selectedRouteIds: [] },
@@ -27,6 +31,8 @@ export const studyInitialState: StudyGameState = {
     typewriterCode: { input: '' },
   },
   viewedHints: {},
+  completedCombineRules: [],
+  completedUseRules: [],
   settings: {
     bgmEnabled: true,
     seEnabled: true,

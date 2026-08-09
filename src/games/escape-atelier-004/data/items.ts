@@ -1,48 +1,117 @@
+import type { ItemDefinition } from '../../../engine/inventory/types';
 import { studyItemImages } from './imageAssets';
 import type { StudyItemId } from '../types';
 
-export type StudyItemDefinition = {
-  id: StudyItemId;
-  name: string;
-  description: string;
-  image: string;
-  alt: string;
-};
-
-export const studyItems: Record<StudyItemId, StudyItemDefinition> = {
-  diaryPage: {
-    id: 'diaryPage',
-    name: '日記のページ',
-    description: 'ところどころインクが薄れた日記のページ。順番を取り戻せば、書斎の記憶が少し戻りそうだ。',
-    image: studyItemImages.diaryPage,
-    alt: '古い日記のページ',
+export const studyItems: Record<StudyItemId, ItemDefinition> = {
+  'diary-piece-01': {
+    id: 'diary-piece-01',
+    name: '日記の破れたページ1',
+    description: '古い日記から破り取られた紙片。文章の一部が残っている。',
+    image: studyItemImages.diaryPiece01,
+    alt: '日記の破れたページ1',
+    inspectable: true,
+    rotatable: true,
   },
-  letterFragment: {
-    id: 'letterFragment',
-    name: '手紙の切れ端',
-    description: '署名だけが残った手紙の断片。暖炉の灰の中から見つかった。',
-    image: studyItemImages.letterFragment,
-    alt: '手紙の切れ端',
+  'diary-piece-02': {
+    id: 'diary-piece-02',
+    name: '日記の破れたページ2',
+    description: '薄いインクで季節のことが書かれた日記の紙片。',
+    image: studyItemImages.diaryPiece02,
+    alt: '日記の破れたページ2',
+    inspectable: true,
+    rotatable: true,
   },
-  inkRibbon: {
-    id: 'inkRibbon',
+  'diary-piece-03': {
+    id: 'diary-piece-03',
+    name: '日記の破れたページ3',
+    description: '端が少し焦げた日記の紙片。冬の日付だけが読める。',
+    image: studyItemImages.diaryPiece03,
+    alt: '日記の破れたページ3',
+    inspectable: true,
+    rotatable: true,
+  },
+  'sealed-letter': {
+    id: 'sealed-letter',
+    name: '封じられた手紙',
+    description: '赤い封蝋で固く閉じられている。無理に開くと破れそうだ。',
+    image: studyItemImages.sealedLetter,
+    alt: '封じられた手紙',
+    inspectable: true,
+  },
+  'heated-letter': {
+    id: 'heated-letter',
+    name: '温めた手紙',
+    description: '暖炉の熱で封蝋が柔らかくなっている。',
+    image: studyItemImages.heatedLetter,
+    alt: '温めた手紙',
+    inspectable: true,
+  },
+  'opened-letter': {
+    id: 'opened-letter',
+    name: '開封された手紙',
+    description: '中には方角と数字が記されている。',
+    image: studyItemImages.openedLetter,
+    alt: '開封された手紙',
+    inspectable: true,
+  },
+  'paper-knife': {
+    id: 'paper-knife',
+    name: '真鍮のペーパーナイフ',
+    description: '古い真鍮製のペーパーナイフ。まだ刃は使えそうだ。',
+    image: studyItemImages.paperKnife,
+    alt: '真鍮のペーパーナイフ',
+    persistent: true,
+    inspectable: true,
+  },
+  'ink-ribbon': {
+    id: 'ink-ribbon',
     name: 'インクリボン',
-    description: '乾きかけたタイプライター用のリボン。まだ少しだけ文字を打てそうだ。',
+    description: '古いタイプライター用のインクリボン。',
     image: studyItemImages.inkRibbon,
-    alt: '古いインクリボン',
+    alt: 'インクリボン',
   },
-  transparentPaper: {
-    id: 'transparentPaper',
+  'cipher-sheet': {
+    id: 'cipher-sheet',
+    name: '暗号表',
+    description: '文字の対応が記された古い表。',
+    image: studyItemImages.cipherSheet,
+    alt: '暗号表',
+    inspectable: true,
+    zoomable: true,
+  },
+  'transparent-sheet': {
+    id: 'transparent-sheet',
     name: '半透明の紙',
-    description: '薄い紙に、赤い線と小さなしるしが描かれている。何かに重ねるためのものらしい。',
-    image: studyItemImages.transparentPaper,
+    description: '薄い半透明の紙。いくつかの線と印が描かれている。',
+    image: studyItemImages.transparentSheet,
     alt: '半透明の紙',
+    inspectable: true,
+    rotatable: true,
+    zoomable: true,
   },
-  memoryKey: {
-    id: 'memoryKey',
-    name: '記憶の鍵',
-    description: '真鍮の小さな鍵。持つと、誰かが大切にしていた本の匂いがする。',
-    image: studyItemImages.memoryKey,
-    alt: '真鍮の鍵',
+  'typed-paper': {
+    id: 'typed-paper',
+    name: 'タイプライターから出た紙',
+    description: '点と線だけが印字されている。',
+    image: studyItemImages.typedPaper,
+    alt: 'タイプライターから出た紙',
+    inspectable: true,
+    zoomable: true,
+  },
+  'overlay-clue': {
+    id: 'overlay-clue',
+    name: '重ね合わせた手がかり',
+    description: '二枚の紙を重ねることで、意味のある情報が現れた。',
+    image: studyItemImages.overlayClue,
+    alt: '重ね合わせた手がかり',
+    inspectable: true,
+  },
+  'study-key': {
+    id: 'study-key',
+    name: '書斎の鍵',
+    description: '古い書斎の出口に使えそうな重い鍵。',
+    image: studyItemImages.studyKey,
+    alt: '書斎の鍵',
+    inspectable: true,
   },
 };

@@ -1,7 +1,35 @@
+import { applyCombineRule, applyItemUseRule, acquireInventoryItem, normalizeInventory, removeInventoryItem, selectInventoryItem, setInventoryItemState, transformInventoryItem } from '../../../engine/inventory/inventoryUtils';
+import { studyItemCombineRules } from '../data/itemCombineRules';
+import { studyItemUseRules } from '../data/itemUseRules';
+import { studyItems } from '../data/items';
 import { studyInitialState } from './initialState';
-import type { StudyAction, StudyGameState } from '../types';
+import type { StudyAction, StudyGameState, StudyItemId } from '../types';
 
 const unique = <T,>(values: T[]) => [...new Set(values)];
+
+function inventoryDataFromState(state: StudyGameState) {
+  return normalizeInventory(state.inventory, studyItems, state.selectedItemId, state.itemStates, state.collectedItems, state.usedItems);
+}
+
+function applyInventoryData(state: StudyGameState, data: ReturnType<typeof inventoryDataFromState>): StudyGameState {
+  return {
+    ...state,
+    inventory: data.inventory,
+    selectedItemId: data.selectedItemId as StudyItemId | null,
+    itemStates: data.itemStates,
+    collectedItems: data.collectedItems.filter((itemId): itemId is StudyItemId => itemId in studyItems),
+    usedItems: data.usedItems.filter((itemId): itemId is StudyItemId => itemId in studyItems),
+  };
+}
+
+function applyFlags(state: StudyGameState, flags: Record<string, boolean> | undefined): StudyGameState {
+  if (!flags) return state;
+  const nextFlags = { ...state.flags };
+  Object.entries(flags).forEach(([key, value]) => {
+    if (key in nextFlags) nextFlags[key as keyof StudyGameState['flags']] = value;
+  });
+  return { ...state, flags: nextFlags };
+}
 
 export function studyReducer(state: StudyGameState, action: StudyAction): StudyGameState {
   switch (action.type) {
@@ -11,20 +39,36 @@ export function studyReducer(state: StudyGameState, action: StudyAction): StudyG
       return { ...state, currentScene: state.currentScene === 'title' ? 'study' : state.currentScene };
     case 'GO_SCENE':
       return { ...state, currentScene: action.scene };
+    case 'ACQUIRE_ITEM': {
+      const result = acquireInventoryItem(inventoryDataFromState(state), studyItems, action.itemId);
+      return applyInventoryData(state, result.data);
+    }
+    case 'REMOVE_ITEM': {
+      const result = removeInventoryItem(inventoryDataFromState(state), action.itemId);
+      return applyInventoryData(state, result.data);
+    }
     case 'SELECT_ITEM':
-      return { ...state, selectedItemId: state.selectedItemId === action.itemId ? null : action.itemId };
+      return applyInventoryData(state, selectInventoryItem(inventoryDataFromState(state), studyItems, action.itemId));
     case 'CLEAR_SELECTION':
       return { ...state, selectedItemId: null };
-    case 'COLLECT_ITEM':
-      if (state.collectedItems.includes(action.itemId)) return state;
-      return { ...state, inventory: unique([...state.inventory, action.itemId]), collectedItems: unique([...state.collectedItems, action.itemId]) };
-    case 'USE_ITEM':
-      return {
-        ...state,
-        inventory: action.consume ? state.inventory.filter((itemId) => itemId !== action.itemId) : state.inventory,
-        usedItems: unique([...state.usedItems, action.itemId]),
-        selectedItemId: state.selectedItemId === action.itemId ? null : state.selectedItemId,
-      };
+    case 'SET_ITEM_STATE': {
+      const result = setInventoryItemState(inventoryDataFromState(state), studyItems, action.itemId, action.stateId);
+      return applyInventoryData(state, result.data);
+    }
+    case 'TRANSFORM_ITEM': {
+      const result = transformInventoryItem(inventoryDataFromState(state), studyItems, action.sourceItemId, action.targetItemId);
+      return applyInventoryData(state, result.data);
+    }
+    case 'COMBINE_ITEMS': {
+      const result = applyCombineRule(inventoryDataFromState(state), studyItems, studyItemCombineRules, state.completedCombineRules, action.firstItemId, action.secondItemId, state.flags);
+      const next = applyFlags(applyInventoryData(state, result.data), result.flags);
+      return result.ruleId ? { ...next, completedCombineRules: unique([...next.completedCombineRules, result.ruleId]) } : next;
+    }
+    case 'USE_ITEM_ON_TARGET': {
+      const result = applyItemUseRule(inventoryDataFromState(state), studyItems, studyItemUseRules, state.completedUseRules, action.itemId, action.targetId, state.flags);
+      const next = applyFlags(applyInventoryData(state, result.data), result.flags);
+      return result.ruleId ? { ...next, completedUseRules: unique([...next.completedUseRules, result.ruleId]) } : next;
+    }
     case 'SOLVE_PUZZLE':
       return state.solvedPuzzles.includes(action.puzzleId) ? state : { ...state, solvedPuzzles: [...state.solvedPuzzles, action.puzzleId] };
     case 'INSPECT':

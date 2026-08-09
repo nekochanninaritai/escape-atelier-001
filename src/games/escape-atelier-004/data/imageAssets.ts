@@ -16,9 +16,17 @@ export const studyImages = {
 };
 
 export const studyItemImages = {
-  diaryPage: asset('item-diary-page.webp'),
-  letterFragment: asset('item-letter-fragment.webp'),
+  diaryPiece01: asset('item-diary-piece-01.webp'),
+  diaryPiece02: asset('item-diary-piece-02.webp'),
+  diaryPiece03: asset('item-diary-piece-03.webp'),
+  sealedLetter: asset('item-sealed-letter.webp'),
+  heatedLetter: asset('item-heated-letter.webp'),
+  openedLetter: asset('item-opened-letter.webp'),
+  paperKnife: asset('item-paper-knife.webp'),
   inkRibbon: asset('item-ink-ribbon.webp'),
-  transparentPaper: asset('item-transparent-paper.webp'),
-  memoryKey: asset('item-memory-key.webp'),
+  cipherSheet: asset('item-cipher-sheet.webp'),
+  transparentSheet: asset('item-transparent-sheet.webp'),
+  typedPaper: asset('item-typed-paper.webp'),
+  overlayClue: asset('item-overlay-clue.webp'),
+  studyKey: asset('item-study-key.webp'),
 } as const;

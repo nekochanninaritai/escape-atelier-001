@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { GameImage } from '../../components/common/GameImage';
 import { Modal } from '../../components/common/Modal';
+import { ItemDetailModal } from '../../engine/inventory/ItemDetailModal';
+import { findCombineRule, normalizeInventory, resolveItemDefinition } from '../../engine/inventory/inventoryUtils';
 import { PhaserPuzzle } from '../../engine/phaser/PhaserPuzzle';
 import { studyGameConfig } from './gameConfig';
 import { studyHints } from './data/hints';
 import { studyImages } from './data/imageAssets';
+import { studyItemCombineRules } from './data/itemCombineRules';
 import { studyItems } from './data/items';
 import { isCorrectTypewriterCode } from './data/puzzles';
 import { sceneCopy, studyHotspots } from './data/scenes';
@@ -40,56 +43,63 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
 
   const go = (scene: StudySceneId) => dispatch({ type: 'GO_SCENE', scene });
   const collect = (itemId: StudyItemId, text: string) => {
-    dispatch({ type: 'COLLECT_ITEM', itemId });
+    dispatch({ type: 'ACQUIRE_ITEM', itemId });
     showMessage(text);
   };
 
   const handleSceneAction = () => {
     if (state.currentScene === 'bookshelf') {
-      if (!state.collectedItems.includes('diaryPage')) collect('diaryPage', '本の隙間から、日記のページが一枚すべり落ちた。');
+      if (!state.collectedItems.includes('diary-piece-01')) collect('diary-piece-01', '本の隙間から、日記の破れたページが一枚すべり落ちた。');
+      else if (!['diary-piece-01', 'diary-piece-02', 'diary-piece-03'].every((itemId) => state.collectedItems.includes(itemId as StudyItemId))) showMessage('日記を戻すには、まだ足りないページがある。');
       else if (!solved.has('diaryRestore')) setPuzzle('diary');
       else showMessage('日記は春から冬へ、静かに順番を取り戻している。');
       return;
     }
     if (state.currentScene === 'fireplace') {
-      if (!state.collectedItems.includes('letterFragment')) collect('letterFragment', '暖炉の灰の奥から、燃え残った手紙の切れ端を拾った。');
+      if (state.selectedItemId === 'sealed-letter') {
+        dispatch({ type: 'USE_ITEM_ON_TARGET', itemId: 'sealed-letter', targetId: 'fireplace' });
+        showMessage('封蝋が少し柔らかくなった。');
+      } else if (!state.collectedItems.includes('sealed-letter')) collect('sealed-letter', '暖炉の灰の奥から、封じられた手紙を拾った。');
       else showMessage('灰の中には、もう読めるものは残っていない。');
       return;
     }
     if (state.currentScene === 'side-table') {
-      if (!state.collectedItems.includes('transparentPaper')) collect('transparentPaper', '小さな引き出しから、赤い線の入った半透明の紙を見つけた。');
+      if (!state.collectedItems.includes('transparent-sheet')) collect('transparent-sheet', '小さな引き出しから、赤い線の入った半透明の紙を見つけた。');
+      else if (!state.collectedItems.includes('paper-knife')) collect('paper-knife', '引き出しの奥に、真鍮のペーパーナイフが残されていた。');
       else showMessage('封蝋は割れている。誰かがここで返事を待っていたようだ。');
       return;
     }
     if (state.currentScene === 'portrait') {
-      showMessage(state.flags.diaryRestored ? '額縁の言葉が、復元した日記の季節と同じ順で光っている。' : '「忘れても、帰れる」。短い言葉が額縁に刻まれている。');
+      if (!state.collectedItems.includes('diary-piece-02')) collect('diary-piece-02', '肖像画の裏から、日記の破れたページが見つかった。');
+      else showMessage(state.flags.diaryRestored ? '額縁の言葉が、復元した日記の季節と同じ順で光っている。' : '「忘れても、帰れる」。短い言葉が額縁に刻まれている。');
       return;
     }
     if (state.currentScene === 'desk') {
       if (!state.flags.diaryRestored) showMessage('引き出しの中には日記の跡がある。先にページを復元できそうだ。');
-      else if (state.selectedItemId === 'transparentPaper' && state.collectedItems.includes('letterFragment') && !state.flags.paperAligned) setPuzzle('paper');
+      else if (state.selectedItemId === 'transparent-sheet' && state.collectedItems.includes('opened-letter') && !state.flags.paperAligned) setPuzzle('paper');
+      else if (!state.collectedItems.includes('cipher-sheet')) collect('cipher-sheet', '机の引き出しから、古い暗号表を見つけた。');
       else showMessage(state.flags.paperAligned ? '手紙には REMEMBER という言葉が浮かび上がっている。' : '手紙の文字は欠けている。何かを重ねれば読めるかもしれない。');
       return;
     }
     if (state.currentScene === 'globe') {
-      if (!state.flags.diaryRestored) showMessage('地球儀は固く、まだ動かない。書斎の記憶が足りないようだ。');
+      if (!state.collectedItems.includes('diary-piece-03')) collect('diary-piece-03', '地球儀の台座から、日記の最後の破れたページを拾った。');
+      else if (!state.flags.diaryRestored) showMessage('地球儀は固く、まだ動かない。書斎の記憶が足りないようだ。');
       else if (!state.flags.memoryRouteAligned) setPuzzle('globe');
       else showMessage('地球儀の航路は、書斎へ帰る道筋を指している。');
       return;
     }
     if (state.currentScene === 'typewriter') {
       if (!state.flags.paperAligned) showMessage('タイプライターは沈黙している。打つべき言葉がまだわからない。');
-      else if (!state.collectedItems.includes('inkRibbon')) collect('inkRibbon', 'タイプライターの横から、乾きかけのインクリボンを見つけた。');
-      else if (state.selectedItemId === 'inkRibbon' && !state.flags.typewriterReady) {
-        dispatch({ type: 'USE_ITEM', itemId: 'inkRibbon', consume: true });
-        dispatch({ type: 'SET_FLAG', key: 'typewriterReady', value: true });
+      else if (!state.collectedItems.includes('ink-ribbon')) collect('ink-ribbon', 'タイプライターの横から、乾きかけのインクリボンを見つけた。');
+      else if (state.selectedItemId === 'ink-ribbon' && !state.flags.typewriterReady) {
+        dispatch({ type: 'USE_ITEM_ON_TARGET', itemId: 'ink-ribbon', targetId: 'typewriter' });
         showMessage('インクリボンを戻した。キーを押せば、まだ文字を刻めそうだ。');
       } else showMessage(state.flags.typewriterReady ? '浮かび上がった言葉を入力できそうだ。' : 'インクリボンを選んで取り付ける必要がある。');
       return;
     }
     if (state.currentScene === 'door') {
       if (!state.flags.doorUnlocked) showMessage('扉は開かない。真鍮の鍵穴が、最後の記憶を待っている。');
-      else if (state.selectedItemId !== 'memoryKey') showMessage('記憶の鍵を選べば、扉を開けられそうだ。');
+      else if (state.selectedItemId !== 'study-key') showMessage('書斎の鍵を選べば、扉を開けられそうだ。');
       else setConfirmDoor(true);
     }
   };
@@ -106,7 +116,8 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
     dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'typewriterCode' });
     dispatch({ type: 'SET_FLAG', key: 'typewriterSolved', value: true });
     dispatch({ type: 'SET_FLAG', key: 'doorUnlocked', value: true });
-    dispatch({ type: 'COLLECT_ITEM', itemId: 'memoryKey' });
+    dispatch({ type: 'ACQUIRE_ITEM', itemId: 'typed-paper' });
+    dispatch({ type: 'ACQUIRE_ITEM', itemId: 'study-key' });
     showMessage('最後の文字が打たれると、真鍮の鍵が机の奥から現れた。');
   };
 
@@ -185,7 +196,7 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
       {message && <div className="messageToast">{message}</div>}
       {settingsOpen && <StudySettings onClose={() => setSettingsOpen(false)} />}
       {hintsOpen && <StudyHints onClose={() => setHintsOpen(false)} />}
-      {confirmDoor && <ConfirmDoor onCancel={() => setConfirmDoor(false)} onOpen={() => { dispatch({ type: 'USE_ITEM', itemId: 'memoryKey', consume: true }); dispatch({ type: 'CLEAR_GAME' }); }} />}
+      {confirmDoor && <ConfirmDoor onCancel={() => setConfirmDoor(false)} onOpen={() => { dispatch({ type: 'USE_ITEM_ON_TARGET', itemId: 'study-key', targetId: 'exit-door' }); dispatch({ type: 'CLEAR_GAME' }); }} />}
       {puzzle === 'diary' && (
         <PhaserPuzzle
           title="日記復元"
@@ -265,19 +276,35 @@ function FocusPanel({ sceneId, onAction, onTypewriterSubmit }: { sceneId: StudyS
 }
 
 function Inventory() {
-  const { state, dispatch } = useStudy();
+  const { state, dispatch, showMessage } = useStudy();
   const [detailItem, setDetailItem] = useState<StudyItemId | null>(null);
+  const inventoryData = normalizeInventory(state.inventory, studyItems, state.selectedItemId, state.itemStates, state.collectedItems, state.usedItems);
+  const getCombinableItems = (itemId: StudyItemId) =>
+    inventoryData.inventory
+      .map((entry) => entry.itemId)
+      .filter((candidateId) => candidateId !== itemId && Boolean(findCombineRule(studyItemCombineRules, itemId, candidateId)));
+  const combineItems = (firstItemId: StudyItemId, secondItemId: StudyItemId) => {
+    const rule = findCombineRule(studyItemCombineRules, firstItemId, secondItemId);
+    dispatch({ type: 'COMBINE_ITEMS', firstItemId, secondItemId });
+    if (rule && !state.completedCombineRules.includes(rule.id)) showMessage(rule.successMessage);
+    else showMessage('この二つは組み合わせられないようだ。');
+    setDetailItem(null);
+  };
+
   return (
     <>
       <section className="studyInventory" aria-label="インベントリ">
         {state.inventory.length === 0 ? <p>持ち物はありません</p> : null}
-        {state.inventory.map((itemId) => {
-          const item = studyItems[itemId];
+        {state.inventory.map((entry) => {
+          const item = resolveItemDefinition(studyItems, entry.itemId, entry.stateId);
+          if (!item) return null;
+          const itemId = entry.itemId as StudyItemId;
           return (
-            <div className="studyInventorySlot" key={itemId}>
+            <div className="studyInventorySlot" key={`${entry.itemId}-${entry.acquiredAt ?? 0}`}>
               <button type="button" className={state.selectedItemId === itemId ? 'studyInventoryItem selected' : 'studyInventoryItem'} onClick={() => dispatch({ type: 'SELECT_ITEM', itemId })} aria-label={`${item.name}を選ぶ`}>
-                <GameImage src={item.image} alt={item.alt} fallbackLabel={item.name} className="studyItemIcon" decorative />
+                <GameImage src={item.image ?? ''} alt={item.alt ?? item.name} fallbackLabel={item.name} className="studyItemIcon" decorative />
                 <span>{item.name}</span>
+                {entry.isUsed ? <em>使用済み</em> : null}
               </button>
               <button type="button" className="studyDetailButton" onClick={() => setDetailItem(itemId)} aria-label={`${item.name}の詳細`}>i</button>
             </div>
@@ -285,12 +312,19 @@ function Inventory() {
         })}
       </section>
       {detailItem && (
-        <Modal title={studyItems[detailItem].name} onClose={() => setDetailItem(null)}>
-          <div className="studyItemDetail">
-            <GameImage src={studyItems[detailItem].image} alt={studyItems[detailItem].alt} fallbackLabel={studyItems[detailItem].name} className="studyLargeItemIcon" />
-            <p>{studyItems[detailItem].description}</p>
-          </div>
-        </Modal>
+        <ItemDetailModal
+          itemId={detailItem}
+          inventoryData={inventoryData}
+          definitions={studyItems}
+          combinableItemIds={getCombinableItems(detailItem)}
+          onClose={() => setDetailItem(null)}
+          onSelectItem={(itemId) => {
+            dispatch({ type: 'SELECT_ITEM', itemId: itemId as StudyItemId });
+            setDetailItem(null);
+          }}
+          onSetItemState={(itemId, stateId) => dispatch({ type: 'SET_ITEM_STATE', itemId: itemId as StudyItemId, stateId })}
+          onCombine={(firstItemId, secondItemId) => combineItems(firstItemId as StudyItemId, secondItemId as StudyItemId)}
+        />
       )}
     </>
   );

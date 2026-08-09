@@ -1,3 +1,5 @@
+import type { InventoryItemState, ItemId, ItemStateId } from '../../../engine/inventory/types';
+
 export type StudySceneId =
   | 'title'
   | 'prologue'
@@ -12,7 +14,20 @@ export type StudySceneId =
   | 'door'
   | 'ending';
 
-export type StudyItemId = 'diaryPage' | 'letterFragment' | 'inkRibbon' | 'transparentPaper' | 'memoryKey';
+export type StudyItemId =
+  | 'diary-piece-01'
+  | 'diary-piece-02'
+  | 'diary-piece-03'
+  | 'sealed-letter'
+  | 'heated-letter'
+  | 'opened-letter'
+  | 'paper-knife'
+  | 'ink-ribbon'
+  | 'cipher-sheet'
+  | 'transparent-sheet'
+  | 'typed-paper'
+  | 'overlay-clue'
+  | 'study-key';
 
 export type StudyPuzzleId = 'diaryRestore' | 'memoryGlobe' | 'paperOverlay' | 'typewriterCode';
 
@@ -40,10 +55,13 @@ export type PaperOverlayState = {
 export type StudyGameState = {
   version: number;
   currentScene: StudySceneId;
-  inventory: StudyItemId[];
+  inventory: InventoryItemState[];
   selectedItemId: StudyItemId | null;
+  itemStates: Partial<Record<StudyItemId, ItemStateId>>;
   collectedItems: StudyItemId[];
   usedItems: StudyItemId[];
+  completedCombineRules: string[];
+  completedUseRules: string[];
   inspectedPoints: string[];
   solvedPuzzles: StudyPuzzleId[];
   flags: {
@@ -54,6 +72,9 @@ export type StudyGameState = {
     typewriterReady: boolean;
     typewriterSolved: boolean;
     doorUnlocked: boolean;
+    letterHeated: boolean;
+    letterOpened: boolean;
+    inkRibbonInstalled: boolean;
   };
   puzzleStates: {
     diaryRestore: DiaryRestoreState;
@@ -80,10 +101,14 @@ export type StudyAction =
   | { type: 'START_NEW' }
   | { type: 'CONTINUE' }
   | { type: 'GO_SCENE'; scene: StudySceneId }
+  | { type: 'ACQUIRE_ITEM'; itemId: StudyItemId }
+  | { type: 'REMOVE_ITEM'; itemId: StudyItemId }
   | { type: 'SELECT_ITEM'; itemId: StudyItemId }
   | { type: 'CLEAR_SELECTION' }
-  | { type: 'COLLECT_ITEM'; itemId: StudyItemId }
-  | { type: 'USE_ITEM'; itemId: StudyItemId; consume?: boolean }
+  | { type: 'USE_ITEM_ON_TARGET'; itemId: StudyItemId; targetId: string }
+  | { type: 'SET_ITEM_STATE'; itemId: StudyItemId; stateId: ItemStateId }
+  | { type: 'TRANSFORM_ITEM'; sourceItemId: StudyItemId; targetItemId: StudyItemId }
+  | { type: 'COMBINE_ITEMS'; firstItemId: StudyItemId; secondItemId: StudyItemId }
   | { type: 'SOLVE_PUZZLE'; puzzleId: StudyPuzzleId }
   | { type: 'INSPECT'; pointId: string }
   | { type: 'SET_FLAG'; key: keyof StudyGameState['flags']; value: boolean }
@@ -95,3 +120,20 @@ export type StudyAction =
   | { type: 'UPDATE_SETTINGS'; settings: Partial<StudySettings> }
   | { type: 'CLEAR_GAME' }
   | { type: 'RESET' };
+
+export const isStudyItemId = (itemId: ItemId): itemId is StudyItemId =>
+  [
+    'diary-piece-01',
+    'diary-piece-02',
+    'diary-piece-03',
+    'sealed-letter',
+    'heated-letter',
+    'opened-letter',
+    'paper-knife',
+    'ink-ribbon',
+    'cipher-sheet',
+    'transparent-sheet',
+    'typed-paper',
+    'overlay-clue',
+    'study-key',
+  ].includes(itemId);

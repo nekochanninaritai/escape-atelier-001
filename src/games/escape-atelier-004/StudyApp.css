@@ -272,6 +272,12 @@
   font-size: 0.78rem;
 }
 
+.studyInventoryItem em {
+  color: #d8c090;
+  font-size: 0.68rem;
+  font-style: normal;
+}
+
 .studyDetailButton {
   position: absolute;
   top: 4px;
