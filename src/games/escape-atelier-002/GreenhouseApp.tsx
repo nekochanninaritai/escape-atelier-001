@@ -12,7 +12,7 @@ import { endingPages, prologuePages } from './data/story';
 import { createMirrorLightPuzzleConfig } from './puzzles/mirror-light/config';
 import { createPlantPotsPuzzleConfig } from './puzzles/plant-pots/config';
 import { createWateringCanPuzzleConfig } from './puzzles/watering-can/config';
-import { hasGreenhouseSaveData } from './state/saveService';
+import { clearGreenhouseSaveData, hasGreenhouseSaveData } from './state/saveService';
 import { useGreenhouse } from './state/useGreenhouse';
 import type { GreenhouseItemId, GreenhousePuzzleId, GreenhouseSceneId } from './types';
 import './GreenhouseApp.css';
@@ -379,6 +379,13 @@ function GreenhouseHints({ onClose }: { onClose: () => void }) {
 
 function GreenhouseSettings({ onClose }: { onClose: () => void }) {
   const { state, dispatch } = useGreenhouse();
+  const resetSave = () => {
+    if (!window.confirm('セーブデータをリセットしますか？')) return;
+    clearGreenhouseSaveData();
+    dispatch({ type: 'RESET' });
+    onClose();
+  };
+
   return (
     <Modal title="設定" onClose={onClose}>
       <div className="greenSettings">
@@ -389,6 +396,7 @@ function GreenhouseSettings({ onClose }: { onClose: () => void }) {
         <div className="greenSettingsActions">
           <button type="button" onClick={() => { dispatch({ type: 'GO_SCENE', scene: 'title' }); onClose(); }}>タイトルへ戻る</button>
           <button type="button" onClick={onClose}>ゲームへ戻る</button>
+          <button type="button" className="greenDangerButton" onClick={resetSave}>セーブリセット</button>
         </div>
       </div>
     </Modal>

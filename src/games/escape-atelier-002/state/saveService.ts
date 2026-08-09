@@ -62,3 +62,11 @@ export function hasGreenhouseSaveData() {
     return false;
   }
 }
+
+export function clearGreenhouseSaveData() {
+  try {
+    window.localStorage.removeItem(GREENHOUSE_SAVE_KEY);
+  } catch {
+    // Storage failures should not stop play.
+  }
+}

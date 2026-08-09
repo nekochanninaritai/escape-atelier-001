@@ -89,3 +89,11 @@ export function hasObservatorySaveData() {
     return false;
   }
 }
+
+export function clearObservatorySaveData() {
+  try {
+    window.localStorage.removeItem(OBSERVATORY_SAVE_KEY);
+  } catch {
+    // Storage failures should not stop play.
+  }
+}

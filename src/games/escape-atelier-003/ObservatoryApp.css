@@ -280,6 +280,11 @@
   gap: 8px;
 }
 
+.obsDangerButton {
+  border-color: #b47b68;
+  background: linear-gradient(180deg, #633127, #341d19);
+}
+
 @media (max-width: 430px) {
   .obsShell {
     grid-template-rows: auto minmax(330px, 1fr) auto auto;
