@@ -1,14 +1,14 @@
 import type { StudyHotspot, StudySceneDefinition, StudySceneId } from '../types';
 
 export const studyHotspots: StudyHotspot[] = [
-  { id: 'bookshelf', label: '大きな本棚', x: 4, y: 14, width: 28, height: 58, targetScene: 'bookshelf' },
-  { id: 'desk', label: '書斎机', x: 34, y: 52, width: 30, height: 28, targetScene: 'desk' },
-  { id: 'typewriter', label: 'タイプライター', x: 43, y: 40, width: 17, height: 16, targetScene: 'typewriter' },
-  { id: 'fireplace', label: '暖炉', x: 67, y: 43, width: 26, height: 31, targetScene: 'fireplace' },
-  { id: 'globe', label: '地球儀', x: 74, y: 18, width: 18, height: 24, targetScene: 'globe' },
-  { id: 'portrait', label: '肖像画', x: 39, y: 12, width: 21, height: 24, targetScene: 'portrait' },
-  { id: 'side-table', label: 'サイドテーブル', x: 10, y: 72, width: 19, height: 17, targetScene: 'side-table' },
-  { id: 'exit-door', label: '出口の扉', x: 0, y: 23, width: 10, height: 58, targetScene: 'exit-door' },
+  { id: 'bookshelf', label: '大きな本棚', x: 26, y: 13, width: 40, height: 60, targetScene: 'bookshelf' },
+  { id: 'desk', label: '書斎机', x: 0, y: 54, width: 30, height: 39, targetScene: 'desk' },
+  { id: 'typewriter', label: 'タイプライター', x: 3, y: 47, width: 18, height: 16, targetScene: 'typewriter' },
+  { id: 'fireplace', label: '暖炉', x: 62, y: 45, width: 20, height: 36, targetScene: 'fireplace' },
+  { id: 'globe', label: '地球儀', x: 22, y: 42, width: 14, height: 22, targetScene: 'globe' },
+  { id: 'portrait', label: '肖像画', x: 66, y: 15, width: 18, height: 29, targetScene: 'portrait' },
+  { id: 'side-table', label: 'サイドテーブル', x: 88, y: 59, width: 12, height: 35, targetScene: 'side-table' },
+  { id: 'exit-door', label: '出口の扉', x: 83, y: 21, width: 15, height: 48, targetScene: 'exit-door' },
 ];
 
 export const studySceneDefinitions: Record<StudySceneId, StudySceneDefinition> = {

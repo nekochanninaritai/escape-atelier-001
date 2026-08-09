@@ -1,8 +1,14 @@
 # Escape Atelier #004 Image Asset Notes
 
-The current production pass uses deterministic locally generated WebP assets in `public/assets/escape-atelier-004/`. They are designed as playable, non-text puzzle-safe artwork: no answer words, numbers, or readable puzzle data are baked into the images.
+The current production pass uses an AI-generated main study illustration as the source for background and focus-scene WebP assets in `public/assets/escape-atelier-004/`. Item icons remain puzzle-safe symbolic assets. No answer words, numbers, or readable puzzle data are baked into the images.
 
-Use these prompts when replacing them with higher quality illustrated assets.
+The source generation prompt was:
+
+```text
+Antique Western mansion study for a quiet escape room about books and memory. Large bookcase, writing desk, vintage typewriter, fireplace, antique globe, framed portrait, side table, and exit door all clearly visible and separated for clickable hotspots. Atmospheric escape room game background, detailed hand-painted digital illustration, slightly realistic but stylized, cinematic soft lighting, elegant interior, warm fireplace glow, brass highlights, dark walnut, antique gold, deep red, ivory, brass. No people, no UI, no readable text, no numbers, no letters, no watermark, no puzzle answers.
+```
+
+Use these prompts when replacing or regenerating the assets.
 
 ## Shared Direction
 
@@ -17,7 +23,7 @@ Use these prompts when replacing them with higher quality illustrated assets.
 | filename | purpose | prompt |
 | --- | --- | --- |
 | `title-bg.webp` | title/prologue background | Antique study in an old mansion, large bookcase, writing desk, typewriter, fireplace glow, globe, portrait, exit door, warm cinematic illustration, no readable text. |
-| `study-main.webp` | main exploration room | Wide vertical-mobile-friendly view of the whole antique study with all major interactable objects clearly separated, warm brass highlights, no readable text. |
+| `study-main.webp` | main exploration room | Wide view of the whole antique study with all major interactable objects clearly separated, warm brass highlights, no readable text. |
 | `study-bookshelf.webp` | bookshelf focus | Large old bookcase with leather-bound books and brass details, some gaps, clear shelves, no readable text or numbers. |
 | `study-desk.webp` | desk focus | Antique writing desk with lamp, papers, drawer, paper knife silhouette, quiet warm light, no readable text. |
 | `study-typewriter.webp` | typewriter focus | Vintage black typewriter on a wooden desk, ivory paper inserted but blank or unreadable, brass accents. |
