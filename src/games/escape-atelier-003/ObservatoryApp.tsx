@@ -296,14 +296,49 @@ function DawnTimePuzzle({ onSolved }: { onSolved: () => void }) {
 
 function Inventory() {
   const { state, dispatch } = useObservatory();
+  const [detailItem, setDetailItem] = useState<ObservatoryItemId | null>(null);
   return (
-    <section className="obsInventory" aria-label="インベントリ">
-      {state.inventory.length === 0 ? <p>持ち物はありません</p> : null}
-      {state.inventory.map((itemId) => {
-        const item = observatoryItems[itemId];
-        return <button key={itemId} type="button" className={state.selectedItemId === itemId ? 'selected' : ''} onClick={() => dispatch({ type: 'SELECT_ITEM', itemId })} aria-label={`${item.name}を選択`}><img src={item.image} alt="" draggable={false} /><span>{item.name}</span></button>;
-      })}
-    </section>
+    <>
+      <section className="obsInventory" aria-label="インベントリ">
+        {state.inventory.length === 0 ? <p>持ち物はありません</p> : null}
+        {state.inventory.map((itemId) => {
+          const item = observatoryItems[itemId];
+          return (
+            <div className="obsInventorySlot" key={itemId}>
+              <button
+                type="button"
+                className={state.selectedItemId === itemId ? 'obsInventoryItem selected' : 'obsInventoryItem'}
+                onClick={() => dispatch({ type: 'SELECT_ITEM', itemId })}
+                onContextMenu={(event) => {
+                  event.preventDefault();
+                  setDetailItem(itemId);
+                }}
+                aria-label={`${item.name}を選択`}
+              >
+                <img src={item.image} alt="" draggable={false} />
+                <span>{item.name}</span>
+              </button>
+              <button type="button" className="obsDetailButton" onClick={() => setDetailItem(itemId)} aria-label={`${item.name}の詳細`}>
+                i
+              </button>
+            </div>
+          );
+        })}
+      </section>
+      {detailItem && (
+        <Modal title={observatoryItems[detailItem].name} onClose={() => setDetailItem(null)}>
+          <div className="obsItemDetail">
+            <GameImage
+              src={observatoryItems[detailItem].image}
+              alt={observatoryItems[detailItem].name}
+              fallbackLabel={observatoryItems[detailItem].name}
+              className="obsLargeItemIcon"
+            />
+            <p>{observatoryItems[detailItem].description}</p>
+          </div>
+        </Modal>
+      )}
+    </>
   );
 }
 

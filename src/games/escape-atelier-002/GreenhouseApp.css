@@ -232,12 +232,31 @@
 }
 
 .greenInventory button {
-  flex: 0 0 86px;
   display: grid;
   justify-items: center;
   align-content: center;
   gap: 3px;
   font-size: 0.72rem;
+}
+
+.greenInventorySlot {
+  flex: 0 0 100px;
+  display: grid;
+  grid-template-columns: 1fr 24px;
+  overflow: hidden;
+  border-radius: 8px;
+}
+
+.greenInventoryItem {
+  min-width: 0;
+  border-radius: 8px 0 0 8px;
+}
+
+.greenDetailButton {
+  min-width: 24px;
+  padding: 0;
+  border-radius: 0 8px 8px 0;
+  border-left-width: 0;
 }
 
 .greenInventory img {
@@ -247,7 +266,7 @@
   filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.42));
 }
 
-.greenInventory button.selected {
+.greenInventoryItem.selected {
   background: #574220;
   outline: 2px solid #d7b46a;
 }
@@ -303,6 +322,31 @@
 .greenDangerButton {
   border-color: #b47b68;
   background: linear-gradient(180deg, #633127, #341d19);
+}
+
+.greenItemDetail {
+  display: grid;
+  gap: 14px;
+  place-items: center;
+}
+
+.greenItemDetail p {
+  margin: 0;
+  line-height: 1.7;
+}
+
+.greenLargeItemIcon {
+  display: grid;
+  place-items: center;
+  width: min(78vw, 320px);
+  aspect-ratio: 1;
+  height: auto;
+  border-radius: 8px;
+  background: rgba(255, 248, 233, 0.06);
+}
+
+.greenLargeItemIcon img {
+  object-fit: contain;
 }
 
 .greenHints section {

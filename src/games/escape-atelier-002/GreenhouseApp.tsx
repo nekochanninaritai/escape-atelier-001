@@ -330,25 +330,49 @@ function FocusPanel({ sceneId, onAction, onColor }: { sceneId: GreenhouseSceneId
 
 function Inventory() {
   const { state, dispatch } = useGreenhouse();
+  const [detailItem, setDetailItem] = useState<GreenhouseItemId | null>(null);
   return (
-    <section className="greenInventory" aria-label="インベントリ">
-      {state.inventory.length === 0 ? <p>持ち物はありません</p> : null}
-      {state.inventory.map((itemId) => {
-        const item = greenhouseItems[itemId];
-        return (
-          <button
-            key={itemId}
-            type="button"
-            className={state.selectedItemId === itemId ? 'selected' : ''}
-            onClick={() => dispatch({ type: 'SELECT_ITEM', itemId })}
-            aria-label={`${item.name}を選択`}
-          >
-            <img src={item.image} alt="" draggable={false} />
-            <span>{item.name}</span>
-          </button>
-        );
-      })}
-    </section>
+    <>
+      <section className="greenInventory" aria-label="インベントリ">
+        {state.inventory.length === 0 ? <p>持ち物はありません</p> : null}
+        {state.inventory.map((itemId) => {
+          const item = greenhouseItems[itemId];
+          return (
+            <div className="greenInventorySlot" key={itemId}>
+              <button
+                type="button"
+                className={state.selectedItemId === itemId ? 'greenInventoryItem selected' : 'greenInventoryItem'}
+                onClick={() => dispatch({ type: 'SELECT_ITEM', itemId })}
+                onContextMenu={(event) => {
+                  event.preventDefault();
+                  setDetailItem(itemId);
+                }}
+                aria-label={`${item.name}を選択`}
+              >
+                <img src={item.image} alt="" draggable={false} />
+                <span>{item.name}</span>
+              </button>
+              <button type="button" className="greenDetailButton" onClick={() => setDetailItem(itemId)} aria-label={`${item.name}の詳細`}>
+                i
+              </button>
+            </div>
+          );
+        })}
+      </section>
+      {detailItem && (
+        <Modal title={greenhouseItems[detailItem].name} onClose={() => setDetailItem(null)}>
+          <div className="greenItemDetail">
+            <GameImage
+              src={greenhouseItems[detailItem].image}
+              alt={greenhouseItems[detailItem].alt}
+              fallbackLabel={greenhouseItems[detailItem].name}
+              className="greenLargeItemIcon"
+            />
+            <p>{greenhouseItems[detailItem].description}</p>
+          </div>
+        </Modal>
+      )}
+    </>
   );
 }
 
