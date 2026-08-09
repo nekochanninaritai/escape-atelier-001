@@ -8,7 +8,7 @@ export const studyInvestigationTargets: Record<string, InvestigationTargetDefini
   globe: { id: 'globe', label: '地球儀', sceneId: 'globe', category: 'object' },
   portrait: { id: 'portrait', label: '肖像画', sceneId: 'portrait', category: 'observation', clueIdOnInspect: 'portrait-clock' },
   'side-table': { id: 'side-table', label: 'サイドテーブル', sceneId: 'side-table', category: 'object' },
-  door: { id: 'door', label: '出口の扉', sceneId: 'door', category: 'location' },
+  'exit-door': { id: 'exit-door', label: '出口の扉', sceneId: 'exit-door', category: 'location' },
   'diary-restore': { id: 'diary-restore', label: '日記復元', category: 'document', clueIdOnInspect: 'diary-restored' },
   'paper-overlay': { id: 'paper-overlay', label: '半透明紙の重ね合わせ', category: 'code', clueIdOnInspect: 'overlay-result' },
 };

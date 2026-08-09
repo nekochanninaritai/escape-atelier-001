@@ -37,7 +37,7 @@ export const createMemoryGlobePuzzleConfig: PhaserPuzzleConfigFactory<MemoryGlob
     private pick(routeId: string) {
       const next = [...this.selectedRouteIds, routeId].slice(-memoryRouteAnswer.length);
       this.selectedRouteIds = next;
-      const state = { selectedRouteIds: next };
+      const state = { ...initialState, selectedRouteIds: next };
       onStateChange(state);
       if (isCorrectMemoryRoute(next)) onComplete(state);
       else this.renderGlobe();

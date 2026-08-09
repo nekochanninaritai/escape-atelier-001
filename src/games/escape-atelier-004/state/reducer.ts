@@ -5,7 +5,8 @@ import { studyInvestigationTargets } from '../data/investigationTargets';
 import { studyItemCombineRules } from '../data/itemCombineRules';
 import { studyItemUseRules } from '../data/itemUseRules';
 import { studyItems } from '../data/items';
-import { studyInitialState } from './initialState';
+import { createInitialStudyGameState } from './initialState';
+import { applyPuzzleReward } from './puzzleRewards';
 import type { StudyAction, StudyGameState, StudyItemId } from '../types';
 
 const unique = <T,>(values: T[]) => [...new Set(values)];
@@ -45,9 +46,9 @@ function applyNotebookData(state: StudyGameState, data: ReturnType<typeof notebo
 export function studyReducer(state: StudyGameState, action: StudyAction): StudyGameState {
   switch (action.type) {
     case 'START_NEW':
-      return { ...studyInitialState, currentScene: 'prologue', settings: state.settings };
+      return { ...createInitialStudyGameState(), currentScene: 'prologue', settings: state.settings };
     case 'CONTINUE':
-      return { ...state, currentScene: state.currentScene === 'title' ? 'study' : state.currentScene };
+      return { ...state, currentScene: state.currentScene === 'title' ? 'study-main' : state.currentScene };
     case 'GO_SCENE':
       return { ...state, currentScene: action.scene };
     case 'ACQUIRE_ITEM': {
@@ -81,19 +82,20 @@ export function studyReducer(state: StudyGameState, action: StudyAction): StudyG
       return result.ruleId ? { ...next, completedUseRules: unique([...next.completedUseRules, result.ruleId]) } : next;
     }
     case 'SOLVE_PUZZLE':
-      return state.solvedPuzzles.includes(action.puzzleId) ? state : { ...state, solvedPuzzles: [...state.solvedPuzzles, action.puzzleId] };
+    case 'COMPLETE_PUZZLE':
+      return applyPuzzleReward(state, action.puzzleId).state;
     case 'INSPECT':
       return { ...state, inspectedPoints: unique([...state.inspectedPoints, action.pointId]) };
     case 'SET_FLAG':
       return { ...state, flags: { ...state.flags, [action.key]: action.value } };
     case 'SET_DIARY_ORDER':
-      return { ...state, puzzleStates: { ...state.puzzleStates, diaryRestore: { pageOrder: action.pageOrder } } };
+      return { ...state, puzzleStates: { ...state.puzzleStates, diaryRepair: { ...state.puzzleStates.diaryRepair, pageOrder: action.pageOrder } } };
     case 'SET_GLOBE_ROUTES':
-      return { ...state, puzzleStates: { ...state.puzzleStates, memoryGlobe: { selectedRouteIds: action.selectedRouteIds } } };
+      return { ...state, puzzleStates: { ...state.puzzleStates, globe: { ...state.puzzleStates.globe, selectedRouteIds: action.selectedRouteIds } } };
     case 'SET_PAPER_OVERLAY':
-      return { ...state, puzzleStates: { ...state.puzzleStates, paperOverlay: action.state } };
+      return { ...state, puzzleStates: { ...state.puzzleStates, overlayPaper: action.state } };
     case 'SET_TYPEWRITER_INPUT':
-      return { ...state, puzzleStates: { ...state.puzzleStates, typewriterCode: { input: action.input } } };
+      return { ...state, puzzleStates: { ...state.puzzleStates, typewriter: { input: action.input } } };
     case 'VIEW_HINT':
       return { ...state, viewedHints: { ...state.viewedHints, [action.puzzleId]: Math.max(state.viewedHints[action.puzzleId] ?? 0, action.level) } };
     case 'DISCOVER_CLUE': {
@@ -115,9 +117,9 @@ export function studyReducer(state: StudyGameState, action: StudyAction): StudyG
     case 'UPDATE_SETTINGS':
       return { ...state, settings: { ...state.settings, ...action.settings } };
     case 'CLEAR_GAME':
-      return { ...state, currentScene: 'ending', isCleared: true, selectedItemId: null, flags: { ...state.flags, doorUnlocked: true } };
+      return { ...state, currentScene: 'ending', isCleared: true, selectedItemId: null, flags: { ...state.flags, doorUnlocked: true, exitDoorUnlocked: true } };
     case 'RESET':
-      return { ...studyInitialState, settings: state.settings };
+      return { ...createInitialStudyGameState(), settings: state.settings };
     default:
       return state;
   }

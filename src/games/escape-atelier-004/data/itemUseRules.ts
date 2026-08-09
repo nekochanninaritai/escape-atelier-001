@@ -31,7 +31,7 @@ export const studyItemUseRules: ItemUseRule[] = [
     targetId: 'exit-door',
     consumeMode: 'mark-used',
     result: {
-      setFlags: { doorUnlocked: true },
+      setFlags: { doorUnlocked: true, exitDoorUnlocked: true },
     },
     successMessage: '鍵穴の奥で、静かに錠が外れた。',
     failureMessage: 'この鍵を使う場所ではない。',

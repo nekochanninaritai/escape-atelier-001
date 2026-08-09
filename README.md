@@ -134,3 +134,20 @@ VITE_BASE_PATH=/repository-name/ npm run build
 - Phaser パズルは図形描画で成立するようにしており、演出は控えめです。
 - 実機スマートフォンでは、320px 幅、ドラッグ中スクロール、タップ対象サイズ、長文表示、画面回転を追加確認してください。
 - build 時に Phaser の静的 import によるチャンクサイズ警告が出ます。既存の第2作も同じ構成で Phaser を静的 import しているため、今回は挙動維持を優先しています。
+
+## Escape Atelier #004
+
+`src/games/escape-atelier-004` に「忘れられた書斎からの脱出」の Part1 基盤を追加しています。
+
+- save key: `escape-atelier-004-save`
+- save version: `STUDY_SAVE_VERSION`
+- canonical scenes: `study-main`, `exit-door` など
+- canonical puzzles: `diary-repair`, `globe`, `typewriter`, `overlay-paper`, `bookshelf`, `portrait-time`
+- shared systems: inventory, item combine/use rules, notebook, investigation log, Phaser puzzle API
+
+Part1-3 では `types`, `state`, `data`, `puzzles` を Part2 で拡張しやすい形に整理しました。保存データは `normalizeStudyState` で旧 ID や壊れた値を安全な初期値へ補正します。
+
+関連 docs:
+
+- `docs/escape-atelier-004-architecture.md`
+- `docs/puzzle-api.md`

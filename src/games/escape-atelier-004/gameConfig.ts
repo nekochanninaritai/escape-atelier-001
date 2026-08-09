@@ -1,4 +1,4 @@
-export const STUDY_SAVE_VERSION = 2;
+export const STUDY_SAVE_VERSION = 3;
 export const STUDY_SAVE_KEY = 'escape-atelier-004-save';
 export const DEBUG_STUDY_HOTSPOTS = import.meta.env.VITE_DEBUG_HOTSPOTS === 'true';
 
@@ -16,6 +16,10 @@ export const studyGameConfig = {
   features: {
     notebook: true,
     investigationLog: true,
+    itemCombination: true,
+    itemInspection: true,
+    phaserPuzzles: true,
+    debugPanel: true,
   },
   assets: {
     images: [
@@ -29,8 +33,9 @@ export const studyGameConfig = {
       'study-portrait.webp',
       'study-side-table.webp',
       'study-door.webp',
+      'study-door-open.webp',
       'ending-bg.webp',
     ],
-    audio: [],
+    audio: ['title-bgm', 'study-bgm', 'ending-bgm', 'item-get', 'correct', 'wrong', 'paper', 'typewriter', 'fireplace', 'globe', 'door'],
   },
 } as const;

@@ -42,10 +42,14 @@ export const createPaperOverlayPuzzleConfig: PhaserPuzzleConfigFactory<PaperOver
 
     private move(dx: number, dy: number, dr: number) {
       this.state = {
+        ...this.state,
         paperOffsetX: Phaser.Math.Clamp(this.state.paperOffsetX + dx, -144, 144),
         paperOffsetY: Phaser.Math.Clamp(this.state.paperOffsetY + dy, -144, 144),
         rotation: Phaser.Math.Clamp(this.state.rotation + dr, -42, 42),
       };
+      this.state.x = this.state.paperOffsetX;
+      this.state.y = this.state.paperOffsetY;
+      this.state.aligned = isPaperAligned(this.state.paperOffsetX, this.state.paperOffsetY, this.state.rotation);
       onStateChange(this.state);
       this.renderOverlay();
     }

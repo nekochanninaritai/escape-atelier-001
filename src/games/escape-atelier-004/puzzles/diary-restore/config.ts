@@ -40,13 +40,13 @@ export const createDiaryRestorePuzzleConfig: PhaserPuzzleConfigFactory<DiaryRest
       } else {
         [this.pageOrder[this.selectedIndex], this.pageOrder[index]] = [this.pageOrder[index], this.pageOrder[this.selectedIndex]];
         this.selectedIndex = null;
-        onStateChange({ pageOrder: [...this.pageOrder] });
+        onStateChange({ ...initialState, pageOrder: [...this.pageOrder] });
       }
       this.renderPages();
     }
 
     private check() {
-      const state = { pageOrder: [...this.pageOrder] };
+      const state = { ...initialState, pageOrder: [...this.pageOrder] };
       onStateChange(state);
       if (isCorrectDiaryOrder(this.pageOrder)) onComplete(state);
     }

@@ -1,0 +1,1 @@
+export { studyHotspots } from './scenes';

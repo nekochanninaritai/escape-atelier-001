@@ -7,7 +7,7 @@ export const studyClues: Record<string, ClueDefinition> = {
     summary: '破れたページをつなぐと、一つの文章になった。',
     detail: '「春にかざす」ことを示唆する文章。本文は Part2 で確定する。',
     category: 'document',
-    relatedPuzzleIds: ['diaryRestore'],
+    relatedPuzzleIds: ['diary-repair'],
     relatedItemIds: ['diary-piece-01', 'diary-piece-02', 'diary-piece-03'],
     tags: ['日記', '季節'],
     sortOrder: 10,
@@ -29,7 +29,7 @@ export const studyClues: Record<string, ClueDefinition> = {
     detail: 'N -> E -> S -> W。数字情報は Part2 で確定する。',
     category: 'code',
     relatedItemIds: ['opened-letter'],
-    relatedPuzzleIds: ['memoryGlobe'],
+    relatedPuzzleIds: ['globe'],
     tags: ['手紙', '方角'],
     sortOrder: 30,
   },
@@ -40,7 +40,7 @@ export const studyClues: Record<string, ClueDefinition> = {
     detail: 'タイプライターの入力と関係しそうな古い表。',
     category: 'code',
     relatedItemIds: ['cipher-sheet'],
-    relatedPuzzleIds: ['typewriterCode'],
+    relatedPuzzleIds: ['typewriter'],
     sortOrder: 40,
   },
   'typed-paper': {
@@ -50,7 +50,7 @@ export const studyClues: Record<string, ClueDefinition> = {
     detail: '半透明の紙と重ねるための情報。具体的な読みは Part2 で確定する。',
     category: 'document',
     relatedItemIds: ['typed-paper'],
-    relatedPuzzleIds: ['paperOverlay'],
+    relatedPuzzleIds: ['overlay-paper'],
     sortOrder: 50,
   },
   'overlay-result': {
@@ -60,7 +60,7 @@ export const studyClues: Record<string, ClueDefinition> = {
     detail: 'BOOK 7 / PAGE 23。値は Part2 で調整可能なデータとして扱う。',
     category: 'code',
     relatedItemIds: ['transparent-sheet', 'typed-paper', 'overlay-clue'],
-    relatedPuzzleIds: ['paperOverlay'],
+    relatedPuzzleIds: ['overlay-paper'],
     sortOrder: 60,
   },
   'selected-book': {
@@ -87,7 +87,7 @@ export const studyClues: Record<string, ClueDefinition> = {
     summary: '本と肖像画を合わせると、ある時刻が浮かび上がる。',
     detail: '最終謎へつながる時刻の手掛かり。正解値は Part2 で確定する。',
     category: 'code',
-    relatedPuzzleIds: ['typewriterCode'],
+    relatedPuzzleIds: ['typewriter'],
     sortOrder: 90,
   },
 };
