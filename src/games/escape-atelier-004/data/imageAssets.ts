@@ -13,6 +13,15 @@ export const studyImages = {
   door: asset('study-door.webp'),
   doorOpen: asset('study-door-open.webp'),
   ending: asset('ending-bg.webp'),
+  bookshelfLeft: asset('study-bookshelf-left.webp'),
+  bookshelfCenter: asset('study-bookshelf-center.webp'),
+  bookshelfRight: asset('study-bookshelf-right.webp'),
+  deskDiaryRestored: asset('study-desk-diary-restored.webp'),
+  globeOpen: asset('study-globe-open.webp'),
+  typewriterReady: asset('study-typewriter-ready.webp'),
+  typewriterPaper: asset('study-typewriter-paper.webp'),
+  portraitShifted: asset('study-portrait-shifted.webp'),
+  portraitOpen: asset('study-portrait-open.webp'),
 };
 
 export const studyItemImages = {

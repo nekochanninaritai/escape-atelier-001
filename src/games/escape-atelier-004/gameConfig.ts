@@ -19,7 +19,7 @@ export const studyGameConfig = {
     itemCombination: true,
     itemInspection: true,
     phaserPuzzles: true,
-    debugPanel: true,
+    debugPanel: DEBUG_STUDY_HOTSPOTS,
   },
   assets: {
     images: [

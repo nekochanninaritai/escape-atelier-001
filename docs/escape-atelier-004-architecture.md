@@ -2,7 +2,7 @@
 
 Escape Atelier #004 "忘れられた書斎からの脱出" is prepared as a React-owned escape game state with Phaser used only for focused operation puzzles.
 
-Part1-3 completes the implementation foundation. Part2 should add final puzzle content and production assets without changing the core state shape.
+Part3 finishes the public QA pass: Part2's puzzle flow remains intact, production-safe placeholder WebP/WAV assets are present, and data integrity tests cover the main progression references.
 
 ## Directories
 
@@ -32,16 +32,17 @@ The #004 save key is `escape-atelier-004-save`.
 
 Save data is serialized with `STUDY_SAVE_VERSION`. `normalizeStudyState` repairs missing fields, legacy IDs, unknown item/clue/puzzle/scene IDs, invalid puzzle positions, duplicate lists, and settings ranges where safe.
 
-## Part2 TODO
+## Production Notes
 
-- [ ] Diary repair final piece data and layout.
-- [ ] Letter content and memory clue final text.
-- [ ] Globe final route presentation.
-- [ ] Typewriter final interaction polish.
-- [ ] Overlay paper production image and alignment values.
-- [ ] Bookshelf puzzle implementation.
-- [ ] Portrait time puzzle implementation.
-- [ ] Final time to exit-door flow.
-- [ ] Ending sequence.
-- [ ] Production image and audio assets.
+- Main-room hotspots must not reveal final notebook clues directly. Progression clues are discovered through item inspection, puzzle rewards, or gated scene actions.
+- `studyGameConfig.features.debugPanel` follows `VITE_DEBUG_HOTSPOTS` and is off by default in production.
+- Scene and item images live in `public/assets/escape-atelier-004/`; audio lives in `public/assets/escape-atelier-004/audio/`.
+- Phaser still owns only focused puzzle drawing/input. React owns all rewards, flags, notebook entries, save data, and scene flow.
+- Canonical answers remain in `src/games/escape-atelier-004/data/puzzles.ts`.
 
+## QA Coverage
+
+- `studyPuzzles.test.ts`: canonical puzzle answers and pure logic.
+- `studyInventory.test.ts`: item acquisition, transform, combine, notebook/log idempotency.
+- `studyState.test.ts`: save normalization, reward chain, duplicate reward prevention.
+- `studyDataIntegrity.test.ts`: public asset existence, audio existence, clue gating, and data cross references.

@@ -7,6 +7,7 @@ React + TypeScript + Vite + Phaser 3 で実装する、スマートフォン縦�
 - Escape Atelier #001 音楽室からの脱出
 - Escape Atelier #002 黄昏の温室からの脱出
 - Escape Atelier #003 星降る天文台からの脱出
+- Escape Atelier #004 忘れられた書斎からの脱出
 
 ## 起動
 
@@ -32,6 +33,7 @@ npm run build
 - #001: `escape-atelier-001-save`
 - #002: `escape-atelier-002-save`
 - #003: `escape-atelier-003-save`
+- #004: `escape-atelier-004-save`
 
 #003 のセーブバージョンは `src/games/escape-atelier-003/data/gameConfig.ts` の `OBSERVATORY_SAVE_VERSION` で管理します。破損 JSON、旧バージョン、不正な area/scene/item/star/rotation/globe position は `state/saveService.ts` で初期値へ復旧します。
 
@@ -137,7 +139,7 @@ VITE_BASE_PATH=/repository-name/ npm run build
 
 ## Escape Atelier #004
 
-`src/games/escape-atelier-004` に「忘れられた書斎からの脱出」の Part1 基盤を追加しています。
+`src/games/escape-atelier-004` に「忘れられた書斎からの脱出」を実装しています。テーマは本・記憶、想定プレイ時間は 40-60 分、難易度は 4 / 5 です。
 
 - save key: `escape-atelier-004-save`
 - save version: `STUDY_SAVE_VERSION`
@@ -145,9 +147,24 @@ VITE_BASE_PATH=/repository-name/ npm run build
 - canonical puzzles: `diary-repair`, `globe`, `typewriter`, `overlay-paper`, `bookshelf`, `portrait-time`
 - shared systems: inventory, item combine/use rules, notebook, investigation log, Phaser puzzle API
 
-Part1-3 では `types`, `state`, `data`, `puzzles` を Part2 で拡張しやすい形に整理しました。保存データは `normalizeStudyState` で旧 ID や壊れた値を安全な初期値へ補正します。
+基本フロー:
+
+1. 日記の破れたページを3枚集め、本棚で Phaser の日記復元パズルを解く
+2. 封蝋された手紙を暖炉で温め、ペーパーナイフで開封する
+3. 手紙の方角に従って Phaser の地球儀パズルを解く
+4. インクリボンをタイプライターへ戻し、暗号表から得た言葉を入力する
+5. タイプライターの紙と半透明の紙を Phaser の重ね合わせパズルで合わせる
+6. BOOK / PAGE の手掛かりで本棚を開き、肖像画の時刻を得る
+7. 肖像画の時刻を合わせて書斎の鍵を入手し、出口の扉を開ける
+
+保存データは `normalizeStudyState` で旧 ID や壊れた値を安全な初期値へ補正します。#004 の背景・アイテム WebP と短い WAV BGM/SE は `public/assets/escape-atelier-004/` に配置しています。謎の答えは画像へ焼き込まず、`src/games/escape-atelier-004/data/puzzles.ts` を正として管理します。
 
 関連 docs:
 
 - `docs/escape-atelier-004-architecture.md`
+- `docs/escape-atelier-004-image-prompts.md`
+- `docs/escape-atelier-004-audio-assets.md`
+- `docs/escape-atelier-004-release-checklist.md`
 - `docs/puzzle-api.md`
+
+第5作以降を追加する場合は、#004 の `data/puzzles.ts` に相当する正解データと純粋関数、`state/saveService.ts` の normalize、`studyDataIntegrity.test.ts` 型の参照整合性テストを先に作ると、進行不能を早く検知できます。

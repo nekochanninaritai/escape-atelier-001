@@ -178,6 +178,9 @@
   bottom: 18px;
   display: grid;
   gap: 12px;
+  max-height: min(68svh, 520px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 16px;
   border: 1px solid rgba(216, 181, 107, 0.5);
   border-radius: 8px;
@@ -201,6 +204,7 @@
 
 .typewriterPanel input,
 .studyInlinePuzzle input {
+  min-height: 44px;
   min-width: 0;
   border: 1px solid rgba(216, 181, 107, 0.7);
   border-radius: 8px;
@@ -300,9 +304,10 @@
 .studyInventory {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: minmax(92px, 1fr);
+  grid-auto-columns: minmax(88px, 112px);
   gap: 8px;
   overflow-x: auto;
+  overscroll-behavior-x: contain;
   padding: 10px 12px;
   background: #140f0d;
   border-top: 1px solid rgba(216, 181, 107, 0.35);
@@ -382,7 +387,7 @@
 .studyBottom {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
   padding: 10px 12px max(10px, env(safe-area-inset-bottom));
   background: #140f0d;
 }
@@ -426,5 +431,73 @@
     right: auto;
     width: min(560px, calc(100% - 32px));
     transform: translateX(-50%);
+  }
+}
+
+@media (max-width: 430px) {
+  .studyHeader {
+    grid-template-columns: 60px 1fr 60px;
+    padding-inline: 8px;
+  }
+
+  .studyHeader button,
+  .studyBottom button {
+    padding-inline: 8px;
+  }
+
+  .studyStage h2 {
+    left: 12px;
+    bottom: 12px;
+    max-width: calc(100% - 24px);
+  }
+
+  .studyFocus {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    max-height: min(72svh, 500px);
+    padding: 12px;
+  }
+
+  .bookChoiceGrid,
+  .pageChoiceGrid {
+    grid-template-columns: repeat(5, minmax(42px, 1fr));
+    gap: 6px;
+  }
+
+  .studyInventory {
+    grid-auto-columns: minmax(82px, 96px);
+    padding-inline: 8px;
+  }
+
+  .studyInventoryItem {
+    min-height: 70px;
+  }
+}
+
+@media (max-height: 680px) {
+  .studyFocus p {
+    line-height: 1.5;
+  }
+
+  .clockFace {
+    width: 92px;
+    height: 92px;
+  }
+
+  .studyItemIcon,
+  .studyLargeItemIcon {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .studyTitle,
+  .studyStory,
+  .studyShell,
+  .studyFocus,
+  .studyInventory {
+    scroll-behavior: auto;
   }
 }

@@ -24,7 +24,7 @@ export function GameImage({ src, alt, fallbackLabel, className, decorative = fal
   return (
     <span className={`gameImageWrap ${className ?? ''} ${loaded ? 'loaded' : ''}`}>
       {!loaded && <span className="imageLoading">読み込み中</span>}
-      <img src={src} alt={decorative ? '' : alt} onLoad={() => setLoaded(true)} onError={() => setFailed(true)} draggable={false} />
+      <img src={src} alt={decorative ? '' : alt} loading="lazy" decoding="async" onLoad={() => setLoaded(true)} onError={() => setFailed(true)} draggable={false} />
     </span>
   );
 }

@@ -19,6 +19,7 @@ import { endingPages, prologuePages } from './data/story';
 import { BookshelfPuzzle } from './components/puzzles/BookshelfPuzzle';
 import { PortraitTimePuzzle } from './components/puzzles/PortraitTimePuzzle';
 import { TypewriterPuzzle } from './components/puzzles/TypewriterPuzzle';
+import { studyAudioService } from './audio/studyAudioService';
 import { createDiaryRestorePuzzleConfig } from './puzzles/diary-restore/config';
 import { createMemoryGlobePuzzleConfig } from './puzzles/memory-globe/config';
 import { createPaperOverlayPuzzleConfig } from './puzzles/paper-overlay/config';
@@ -51,9 +52,16 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
     dispatch({ type: launchMode === 'start' ? 'START_NEW' : 'CONTINUE' });
   }, [dispatch, launchMode]);
 
+  useEffect(() => {
+    const bgmId = state.currentScene === 'title' ? 'title-bgm' : state.currentScene === 'ending' ? 'ending-bgm' : 'study-bgm';
+    studyAudioService.playBgm(bgmId, state.settings);
+    return () => studyAudioService.stopBgm();
+  }, [state.currentScene, state.settings]);
+
   const go = (scene: StudySceneId) => dispatch({ type: 'GO_SCENE', scene });
   const collect = (itemId: StudyItemId, text: string) => {
     dispatch({ type: 'ACQUIRE_ITEM', itemId });
+    studyAudioService.playSe('item-get', state.settings);
     showMessage(text);
   };
   const discoverClue = (clueId: string) => {
@@ -81,6 +89,7 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
     if (state.currentScene === 'fireplace') {
       if (state.selectedItemId === 'sealed-letter') {
         dispatch({ type: 'USE_ITEM_ON_TARGET', itemId: 'sealed-letter', targetId: 'fireplace' });
+        studyAudioService.playSe('fireplace', state.settings);
         showMessage('封蝋が少し柔らかくなった。');
       } else if (!state.flags.diaryRestored) showMessage('暖炉には弱い熱が残っている。何かを温める手掛かりが必要だ。');
       else showMessage('灰の中には、もう読めるものは残っていない。');
@@ -97,7 +106,10 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
     }
     if (state.currentScene === 'portrait') {
       if (!solved.has('bookshelf')) showMessage('額縁には「忘れても、帰れる」と刻まれている。まだ時刻は分からない。');
-      else if (!solved.has('portrait-time')) showMessage('肖像画の裏に小さな時刻合わせがある。');
+      else if (!solved.has('portrait-time')) {
+        discoverClue('portrait-clock');
+        showMessage('肖像画の裏に小さな時刻合わせがある。');
+      }
       else showMessage('肖像画の裏は開き、鍵が取り出された。');
       return;
     }
@@ -124,6 +136,7 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
       else if (!state.collectedItems.includes('ink-ribbon')) collect('ink-ribbon', 'タイプライターの横から、乾きかけのインクリボンを見つけた。');
       else if (state.selectedItemId === 'ink-ribbon' && !state.flags.typewriterReady) {
         dispatch({ type: 'USE_ITEM_ON_TARGET', itemId: 'ink-ribbon', targetId: 'typewriter' });
+        studyAudioService.playSe('typewriter', state.settings);
         showMessage('インクリボンを戻した。キーを押せば、まだ文字を刻めそうだ。');
       } else if (!state.flags.typewriterReady) showMessage('インクリボンを選んで取り付ける必要がある。');
       else if (!state.collectedItems.includes('cipher-sheet')) showMessage('打つべき言葉を読むための暗号表が必要だ。');
@@ -147,6 +160,7 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
       return;
     }
     dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'typewriter' });
+    studyAudioService.playSe('typewriter', state.settings);
     showMessage('最後の文字が打たれると、タイプライターから紙が一枚送り出された。');
   };
 
@@ -258,6 +272,7 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
             dispatch({ type: 'SET_FLAG', key: 'globeUnlocked', value: true });
             dispatch({ type: 'DISCOVER_CLUE', clueId: 'diary-restored' });
             dispatch({ type: 'RECORD_INVESTIGATION', targetId: 'diary-restore', message: '日記のページを復元した。' });
+            studyAudioService.playSe('paper', state.settings);
             setPuzzle(null);
             showMessage('日記が春から冬へつながった。地球儀の留め具が小さく鳴った。');
           }}
@@ -275,6 +290,7 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
             dispatch({ type: 'SET_GLOBE_ROUTES', selectedRouteIds: nextState.selectedRouteIds });
             dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'globe' });
             dispatch({ type: 'SET_FLAG', key: 'memoryRouteAligned', value: true });
+            studyAudioService.playSe('globe', state.settings);
             setPuzzle(null);
             showMessage('地球儀の航路が書斎へ戻った。机の手紙がほのかに光っている。');
           }}
@@ -295,6 +311,7 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
             dispatch({ type: 'DISCOVER_CLUE', clueId: 'overlay-result' });
             dispatch({ type: 'ACQUIRE_ITEM', itemId: 'overlay-clue' });
             dispatch({ type: 'RECORD_INVESTIGATION', targetId: 'paper-overlay', message: '半透明の紙を重ね、文字を読んだ。' });
+            studyAudioService.playSe('correct', state.settings);
             setPuzzle(null);
             showMessage('欠けた文字が重なり、BOOK 7 / PAGE 23 と読めるようになった。');
           }}
@@ -327,6 +344,7 @@ function FocusPanel({ sceneId, onAction, onTypewriterSubmit }: { sceneId: StudyS
           onComplete={() => {
             dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'bookshelf' });
             dispatch({ type: 'RECORD_INVESTIGATION', targetId: 'bookshelfPuzzle', message: 'BOOK 7 の PAGE 23 を開いた。' });
+            studyAudioService.playSe('correct', state.settings);
             showMessage('ページに「肖像画の時刻は七時十五分」と記されていた。');
           }}
         />
@@ -338,6 +356,7 @@ function FocusPanel({ sceneId, onAction, onTypewriterSubmit }: { sceneId: StudyS
           onComplete={() => {
             dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'portrait-time' });
             dispatch({ type: 'RECORD_INVESTIGATION', targetId: 'portraitTime', message: '肖像画の時刻を07:15に合わせた。' });
+            studyAudioService.playSe('correct', state.settings);
             showMessage('肖像画の裏から、書斎の鍵が滑り落ちた。');
           }}
         />
@@ -453,7 +472,8 @@ function StudySettings({ onClose }: { onClose: () => void }) {
 }
 
 function ConfirmDoor({ onCancel, onOpen }: { onCancel: () => void; onOpen: () => void }) {
-  return <Modal title="記憶の鍵を使いますか？" onClose={onCancel}><div className="studyConfirm"><button type="button" onClick={onCancel}>やめる</button><button type="button" onClick={onOpen}>鍵を回す</button></div></Modal>;
+  const { state } = useStudy();
+  return <Modal title="記憶の鍵を使いますか？" onClose={onCancel}><div className="studyConfirm"><button type="button" onClick={onCancel}>やめる</button><button type="button" onClick={() => { studyAudioService.playSe('door', state.settings); onOpen(); }}>鍵を回す</button></div></Modal>;
 }
 
 function StoryView({ pages, page, title, onNext, onSkip, finished = false, actions }: { pages: string[]; page: number; title: string; onNext: () => void; onSkip?: () => void; finished?: boolean; actions?: ReactNode }) {
