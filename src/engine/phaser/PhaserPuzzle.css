@@ -51,6 +51,13 @@
   min-height: 44px;
 }
 
+.phaserFallbackActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
 .phaserHost {
   width: 100%;
   aspect-ratio: 720 / 520;

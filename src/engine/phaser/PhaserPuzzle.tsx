@@ -1,23 +1,47 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Phaser from 'phaser';
-import type { PhaserPuzzleConfigFactory } from './types';
+import { PuzzleShell } from './components/PuzzleShell';
+import { createPhaserGame } from './core/createPhaserGame';
+import { DEFAULT_PUZZLE_ID, DEFAULT_PUZZLE_VIEWPORT } from './core/puzzleContext';
+import { destroyPhaserGame } from './utils/cleanup';
+import type { PhaserPuzzleConfigFactory, PuzzleId, PuzzleViewport } from './types';
 import './PhaserPuzzle.css';
 
-type PhaserPuzzleProps<TState> = {
+type PhaserPuzzleProps<TState, TResult = undefined> = {
+  puzzleId?: PuzzleId;
   title: string;
   instructions: string;
   initialState: TState;
-  createConfig: PhaserPuzzleConfigFactory<TState>;
-  onComplete: (state: TState) => void;
-  onCancel: (state: TState) => void;
+  createConfig: PhaserPuzzleConfigFactory<TState, TResult>;
+  viewport?: PuzzleViewport;
+  onComplete: (state: TState, result?: TResult) => void;
+  onCancel?: (state: TState) => void;
+  onClose?: (state: TState) => void;
+  onStateChange?: (state: TState) => void;
+  onError?: (error: Error) => void;
 };
 
-export function PhaserPuzzle<TState>({ title, instructions, initialState, createConfig, onComplete, onCancel }: PhaserPuzzleProps<TState>) {
+const PHASER_BOOT_ERROR = 'パズルの読み込みに失敗しました。もう一度お試しください。';
+
+export function PhaserPuzzle<TState, TResult = undefined>({
+  puzzleId = DEFAULT_PUZZLE_ID,
+  title,
+  instructions,
+  initialState,
+  createConfig,
+  viewport = DEFAULT_PUZZLE_VIEWPORT,
+  onComplete,
+  onCancel,
+  onClose,
+  onStateChange,
+  onError,
+}: PhaserPuzzleProps<TState, TResult>) {
   const hostRef = useRef<HTMLDivElement | null>(null);
   const gameRef = useRef<Phaser.Game | null>(null);
   const latestState = useRef(initialState);
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState(false);
+  const [bootKey, setBootKey] = useState(0);
   const reducedMotion = useMemo(() => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false, []);
 
   useEffect(() => {
@@ -28,74 +52,66 @@ export function PhaserPuzzle<TState>({ title, instructions, initialState, create
     let cancelled = false;
     document.body.classList.add('phaserPuzzleActive');
 
-    const boot = async () => {
+    const boot = () => {
       try {
-        if (!hostRef.current || gameRef.current) return;
-        if (cancelled) return;
-        const config = createConfig({
-          initialState,
-          reducedMotion,
-          onStateChange: (state) => {
-            latestState.current = state;
-          },
-          onComplete: (state) => {
-            latestState.current = state;
-            onComplete(state);
-          },
-        });
-        gameRef.current = new Phaser.Game({
-          ...config,
-          type: Phaser.AUTO,
+        if (!hostRef.current || gameRef.current || cancelled) return;
+        gameRef.current = createPhaserGame({
           parent: hostRef.current,
-          scale: {
-            mode: Phaser.Scale.FIT,
-            autoCenter: Phaser.Scale.CENTER_BOTH,
-            width: 720,
-            height: 520,
+          createConfig,
+          viewport,
+          callbacks: {
+            puzzleId,
+            viewport,
+            initialState,
+            reducedMotion,
+            onStateChange: (state) => {
+              latestState.current = state;
+              onStateChange?.(state);
+            },
+            onComplete: (state, result) => {
+              latestState.current = state;
+              onComplete(state, result);
+            },
+            onError: (nextError) => {
+              setError(nextError.message);
+              onError?.(nextError);
+            },
           },
-          backgroundColor: '#1d2d24',
         });
         setReady(true);
-      } catch {
-        setError('パズルの読み込みに失敗しました。戻ってもう一度お試しください。');
+      } catch (nextError) {
+        const errorObject = nextError instanceof Error ? nextError : new Error(PHASER_BOOT_ERROR);
+        setError(PHASER_BOOT_ERROR);
+        onError?.(errorObject);
       }
     };
 
-    void boot();
+    boot();
     return () => {
       cancelled = true;
       document.body.classList.remove('phaserPuzzleActive');
-      gameRef.current?.destroy(true);
+      destroyPhaserGame(gameRef.current);
       gameRef.current = null;
+      setReady(false);
     };
-  }, [createConfig, initialState, onComplete, reducedMotion]);
+  }, [bootKey, createConfig, initialState, onComplete, onError, onStateChange, puzzleId, reducedMotion, viewport]);
+
+  const closePuzzle = () => {
+    const closeHandler = onCancel ?? onClose;
+    closeHandler?.(latestState.current);
+  };
+
+  const retryPuzzle = () => {
+    setError(null);
+    setReady(false);
+    destroyPhaserGame(gameRef.current);
+    gameRef.current = null;
+    setBootKey((current) => current + 1);
+  };
 
   return (
-    <div className="phaserOverlay" role="dialog" aria-modal="true" aria-label={title}>
-      <section className="phaserPanel">
-        <header className="phaserHeader">
-          <div>
-            <h2>{title}</h2>
-            <p>{instructions}</p>
-          </div>
-          <button type="button" onClick={() => onCancel(latestState.current)} aria-label="パズルを閉じる">
-            戻る
-          </button>
-        </header>
-        {error ? (
-          <div className="phaserFallback">
-            <p>{error}</p>
-            <button type="button" onClick={() => onCancel(latestState.current)}>
-              戻る
-            </button>
-          </div>
-        ) : (
-          <>
-            {!ready && <p className="phaserLoading">読み込み中...</p>}
-            <div ref={hostRef} className="phaserHost" />
-          </>
-        )}
-      </section>
-    </div>
+    <PuzzleShell title={title} instructions={instructions} loading={!ready} error={error} onClose={closePuzzle} onRetry={retryPuzzle}>
+      <div ref={hostRef} className="phaserHost" />
+    </PuzzleShell>
   );
 }
