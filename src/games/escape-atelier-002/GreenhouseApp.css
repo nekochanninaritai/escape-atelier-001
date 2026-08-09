@@ -168,7 +168,7 @@
   box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.42);
 }
 
-.greenStage h2 {
+.greenStage > h2 {
   position: absolute;
   left: 18px;
   bottom: 16px;
@@ -203,6 +203,17 @@
 .greenFocus h2,
 .greenFocus p {
   margin: 0;
+}
+
+.greenFocus h2 {
+  position: static;
+  font-size: 1.08rem;
+  line-height: 1.3;
+}
+
+.greenFocus button {
+  width: 100%;
+  line-height: 1.25;
 }
 
 .greenInventory {
