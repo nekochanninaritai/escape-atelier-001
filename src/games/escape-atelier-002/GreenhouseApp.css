@@ -109,7 +109,8 @@
 .greenFocus button,
 .greenInventory button,
 .greenConfirm button,
-.greenHints button {
+.greenHints button,
+.greenSettingsActions button {
   min-height: 44px;
   border-radius: 8px;
   border: 1px solid rgba(215, 180, 106, 0.62);
@@ -281,6 +282,11 @@
 .greenSettings label {
   display: grid;
   gap: 6px;
+}
+
+.greenSettingsActions {
+  display: grid;
+  gap: 8px;
 }
 
 .greenHints section {

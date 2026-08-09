@@ -19,7 +19,7 @@ import './GreenhouseApp.css';
 
 type PuzzleOverlay = 'wateringCan' | 'plantPots' | 'mirrorLight' | null;
 
-export function GreenhouseApp({ onSeriesSelect }: { onSeriesSelect: () => void }) {
+export function GreenhouseApp() {
   const { state, dispatch, message, showMessage } = useGreenhouse();
   const [storyPage, setStoryPage] = useState(0);
   const [endingPage, setEndingPage] = useState(0);
@@ -138,7 +138,6 @@ export function GreenhouseApp({ onSeriesSelect }: { onSeriesSelect: () => void }
             <button type="button" onClick={() => dispatch({ type: 'START_NEW' })}>はじめから</button>
             <button type="button" disabled={!hasGreenhouseSaveData()} onClick={() => dispatch({ type: 'CONTINUE' })}>つづきから</button>
             <button type="button" onClick={() => setSettingsOpen(true)}>設定</button>
-            <button type="button" onClick={onSeriesSelect}>作品選択</button>
           </div>
         </section>
         {settingsOpen && <GreenhouseSettings onClose={() => setSettingsOpen(false)} />}
@@ -171,7 +170,6 @@ export function GreenhouseApp({ onSeriesSelect }: { onSeriesSelect: () => void }
           <>
             <button type="button" onClick={() => go('title')}>タイトルへ戻る</button>
             <button type="button" onClick={() => dispatch({ type: 'START_NEW' })}>もう一度遊ぶ</button>
-            <button type="button" onClick={onSeriesSelect}>シリーズ選択へ戻る</button>
           </>
         }
       />
@@ -217,7 +215,6 @@ export function GreenhouseApp({ onSeriesSelect }: { onSeriesSelect: () => void }
       <nav className="greenBottom">
         <button type="button" onClick={() => setHintsOpen(true)}>ヒント</button>
         <button type="button" onClick={() => setSettingsOpen(true)}>設定</button>
-        <button type="button" onClick={onSeriesSelect}>作品選択</button>
       </nav>
 
       {message && <div className="messageToast">{message}</div>}
@@ -388,6 +385,10 @@ function GreenhouseSettings({ onClose }: { onClose: () => void }) {
         <label><input type="checkbox" checked={state.settings.seEnabled} onChange={(event) => dispatch({ type: 'UPDATE_SETTINGS', settings: { seEnabled: event.target.checked } })} /> SE</label>
         <label>BGM音量<input type="range" min="0" max="1" step="0.05" value={state.settings.bgmVolume} onChange={(event) => dispatch({ type: 'UPDATE_SETTINGS', settings: { bgmVolume: Number(event.target.value) } })} /></label>
         <label>SE音量<input type="range" min="0" max="1" step="0.05" value={state.settings.seVolume} onChange={(event) => dispatch({ type: 'UPDATE_SETTINGS', settings: { seVolume: Number(event.target.value) } })} /></label>
+        <div className="greenSettingsActions">
+          <button type="button" onClick={() => dispatch({ type: 'GO_SCENE', scene: 'title' })}>タイトルへ戻る</button>
+          <button type="button" onClick={onClose}>ゲームへ戻る</button>
+        </div>
       </div>
     </Modal>
   );

@@ -20,7 +20,7 @@ import './ObservatoryApp.css';
 
 type PuzzleOverlay = 'plate' | 'globe' | 'telescope' | 'lines' | null;
 
-export function ObservatoryApp({ onSeriesSelect }: { onSeriesSelect: () => void }) {
+export function ObservatoryApp() {
   const { state, dispatch, message, showMessage } = useObservatory();
   const [storyPage, setStoryPage] = useState(0);
   const [endingPage, setEndingPage] = useState(0);
@@ -137,7 +137,6 @@ export function ObservatoryApp({ onSeriesSelect }: { onSeriesSelect: () => void 
             <button type="button" onClick={() => dispatch({ type: 'START_NEW' })}>はじめから</button>
             <button type="button" disabled={!hasObservatorySaveData()} onClick={() => dispatch({ type: 'CONTINUE' })}>つづきから</button>
             <button type="button" onClick={() => setSettingsOpen(true)}>設定</button>
-            <button type="button" onClick={onSeriesSelect}>作品選択</button>
           </div>
         </section>
         {settingsOpen && <ObservatorySettings onClose={() => setSettingsOpen(false)} />}
@@ -158,7 +157,7 @@ export function ObservatoryApp({ onSeriesSelect }: { onSeriesSelect: () => void 
         title={finished ? 'ESCAPE' : 'Ending'}
         onNext={() => setEndingPage(endingPage + 1)}
         finished={finished}
-        actions={<><button type="button" onClick={() => go('title')}>タイトルへ戻る</button><button type="button" onClick={() => dispatch({ type: 'START_NEW' })}>もう一度遊ぶ</button><button type="button" onClick={onSeriesSelect}>シリーズ選択へ戻る</button></>}
+        actions={<><button type="button" onClick={() => go('title')}>タイトルへ戻る</button><button type="button" onClick={() => dispatch({ type: 'START_NEW' })}>もう一度遊ぶ</button></>}
       />
     );
   }
@@ -203,7 +202,7 @@ export function ObservatoryApp({ onSeriesSelect }: { onSeriesSelect: () => void 
       </section>
 
       <Inventory />
-      <nav className="obsBottom"><button type="button" onClick={() => setHintsOpen(true)}>ヒント</button><button type="button" onClick={() => setSettingsOpen(true)}>設定</button><button type="button" onClick={onSeriesSelect}>作品選択</button></nav>
+      <nav className="obsBottom"><button type="button" onClick={() => setHintsOpen(true)}>ヒント</button><button type="button" onClick={() => setSettingsOpen(true)}>設定</button></nav>
       {message && <div className="messageToast">{message}</div>}
       {settingsOpen && <ObservatorySettings onClose={() => setSettingsOpen(false)} />}
       {hintsOpen && <ObservatoryHints onClose={() => setHintsOpen(false)} />}
@@ -317,7 +316,7 @@ function ObservatoryHints({ onClose }: { onClose: () => void }) {
 
 function ObservatorySettings({ onClose }: { onClose: () => void }) {
   const { state, dispatch } = useObservatory();
-  return <Modal title="設定" onClose={onClose}><div className="obsSettings"><label><input type="checkbox" checked={state.settings.bgmEnabled} onChange={(event) => dispatch({ type: 'UPDATE_SETTINGS', settings: { bgmEnabled: event.target.checked } })} /> BGM</label><label><input type="checkbox" checked={state.settings.seEnabled} onChange={(event) => dispatch({ type: 'UPDATE_SETTINGS', settings: { seEnabled: event.target.checked } })} /> SE</label><label>BGM音量<input type="range" min="0" max="1" step="0.05" value={state.settings.bgmVolume} onChange={(event) => dispatch({ type: 'UPDATE_SETTINGS', settings: { bgmVolume: Number(event.target.value) } })} /></label><label>SE音量<input type="range" min="0" max="1" step="0.05" value={state.settings.seVolume} onChange={(event) => dispatch({ type: 'UPDATE_SETTINGS', settings: { seVolume: Number(event.target.value) } })} /></label></div></Modal>;
+  return <Modal title="設定" onClose={onClose}><div className="obsSettings"><label><input type="checkbox" checked={state.settings.bgmEnabled} onChange={(event) => dispatch({ type: 'UPDATE_SETTINGS', settings: { bgmEnabled: event.target.checked } })} /> BGM</label><label><input type="checkbox" checked={state.settings.seEnabled} onChange={(event) => dispatch({ type: 'UPDATE_SETTINGS', settings: { seEnabled: event.target.checked } })} /> SE</label><label>BGM音量<input type="range" min="0" max="1" step="0.05" value={state.settings.bgmVolume} onChange={(event) => dispatch({ type: 'UPDATE_SETTINGS', settings: { bgmVolume: Number(event.target.value) } })} /></label><label>SE音量<input type="range" min="0" max="1" step="0.05" value={state.settings.seVolume} onChange={(event) => dispatch({ type: 'UPDATE_SETTINGS', settings: { seVolume: Number(event.target.value) } })} /></label><div className="obsSettingsActions"><button type="button" onClick={() => dispatch({ type: 'GO_SCENE', scene: 'title' })}>タイトルへ戻る</button><button type="button" onClick={onClose}>ゲームへ戻る</button></div></div></Modal>;
 }
 
 function ConfirmSkylight({ onCancel, onOpen }: { onCancel: () => void; onOpen: () => void }) {
