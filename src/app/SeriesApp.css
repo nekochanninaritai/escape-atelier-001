@@ -10,7 +10,7 @@
 }
 
 .seriesHero {
-  width: min(100%, 520px);
+  width: min(100%, 760px);
   display: grid;
   gap: 18px;
 }
@@ -33,20 +33,110 @@
   gap: 12px;
 }
 
-.episodeList button {
-  min-height: 74px;
+.episodeCard {
+  display: grid;
+  grid-template-columns: 82px 1fr;
+  gap: 12px;
   border: 1px solid rgba(219, 190, 125, 0.62);
   border-radius: 8px;
   color: #fff8e9;
   background: rgba(18, 25, 22, 0.72);
-  text-align: left;
-  padding: 14px 16px;
+  padding: 12px;
+}
+
+.episodeThumb {
+  min-height: 86px;
+  display: grid;
+  place-items: end start;
+  padding: 8px;
+  border-radius: 6px;
+  background:
+    linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.54)),
+    linear-gradient(135deg, #5a3628, #1e2824);
+}
+
+.episodeThumb-002 {
+  background:
+    linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.54)),
+    linear-gradient(135deg, #31513f, #8d6f2c);
+}
+
+.episodeThumb-003 {
+  background:
+    linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.54)),
+    linear-gradient(135deg, #20243f, #7c7345);
+}
+
+.episodeThumb-004 {
+  background:
+    linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.54)),
+    linear-gradient(135deg, #2b1712, #7a1f24 48%, #b8924a);
+}
+
+.episodeThumb span {
+  font-size: 0.72rem;
+  color: #f7efd9;
+}
+
+.episodeMeta {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 3px;
+}
+
+.episodeMeta span,
+.episodeMeta strong {
+  color: #d7b46a;
+  font-weight: 700;
+}
+
+.episodeMeta h2 {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.35;
+}
+
+.episodeMeta p {
+  margin: 0;
+  color: #e9dcc2;
+  font-size: 0.88rem;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.episodeActions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.episodeActions button {
+  min-height: 46px;
+  border: 1px solid rgba(219, 190, 125, 0.62);
+  border-radius: 8px;
+  color: #fff8e9;
+  background: rgba(18, 25, 22, 0.86);
+  text-align: center;
+  padding: 10px 12px;
   font: inherit;
   cursor: pointer;
 }
 
-.episodeList button span {
-  display: block;
-  color: #d7b46a;
-  font-weight: 700;
+.episodeActions button:disabled {
+  cursor: default;
+  opacity: 0.44;
+}
+
+@media (min-width: 680px) {
+  .episodeCard {
+    grid-template-columns: 110px 1fr auto;
+    align-items: center;
+  }
+
+  .episodeActions {
+    grid-column: auto;
+    width: 220px;
+  }
 }
