@@ -199,7 +199,8 @@
   gap: 8px;
 }
 
-.typewriterPanel input {
+.typewriterPanel input,
+.studyInlinePuzzle input {
   min-width: 0;
   border: 1px solid rgba(216, 181, 107, 0.7);
   border-radius: 8px;
@@ -208,6 +209,92 @@
   padding: 0 12px;
   font: inherit;
   text-transform: uppercase;
+}
+
+.studyInlinePuzzle {
+  display: grid;
+  gap: 10px;
+}
+
+.studyPuzzleNote,
+.studyPuzzleResult {
+  margin: 0;
+  color: #ead9b8;
+}
+
+.studyPuzzleResult {
+  color: #f0ce7a;
+  font-weight: 700;
+}
+
+.bookChoiceGrid,
+.pageChoiceGrid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.bookChoiceGrid button,
+.pageChoiceGrid button {
+  min-height: 44px;
+  border: 1px solid rgba(216, 181, 107, 0.55);
+  border-radius: 8px;
+  background: rgba(59, 38, 31, 0.9);
+  color: #fff7e8;
+  font: inherit;
+}
+
+.bookChoiceGrid button.selected,
+.pageChoiceGrid button.selected {
+  border-color: #f0ce7a;
+  background: rgba(122, 31, 36, 0.88);
+}
+
+.portraitTimePuzzle label {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  align-items: center;
+  gap: 8px;
+}
+
+.clockFace {
+  position: relative;
+  justify-self: center;
+  width: 108px;
+  height: 108px;
+  border: 2px solid #d8b56b;
+  border-radius: 50%;
+  background: #ead9b8;
+}
+
+.clockFace::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #7a1f24;
+  transform: translate(-50%, -50%);
+}
+
+.clockHand {
+  position: absolute;
+  left: calc(50% - 2px);
+  bottom: 50%;
+  width: 4px;
+  transform-origin: 50% 100%;
+  background: #3a221c;
+}
+
+.clockHand.hour {
+  height: 28px;
+}
+
+.clockHand.minute {
+  height: 42px;
+  background: #7a1f24;
 }
 
 .studyInventory {

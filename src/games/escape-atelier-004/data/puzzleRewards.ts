@@ -12,6 +12,7 @@ export type PuzzleRewardDefinition = {
 export const studyPuzzleRewards: Record<StudyPuzzleId, PuzzleRewardDefinition> = {
   'diary-repair': {
     puzzleId: 'diary-repair',
+    removeItemIds: ['diary-piece-01', 'diary-piece-02', 'diary-piece-03'],
     discoverClueIds: ['diary-restored'],
     setFlags: {
       diaryRestored: true,
@@ -29,12 +30,10 @@ export const studyPuzzleRewards: Record<StudyPuzzleId, PuzzleRewardDefinition> =
   },
   typewriter: {
     puzzleId: 'typewriter',
-    acquireItemIds: ['typed-paper', 'study-key'],
+    acquireItemIds: ['typed-paper'],
+    discoverClueIds: ['typed-paper'],
     setFlags: {
       typewriterSolved: true,
-      studyKeyFound: true,
-      exitDoorUnlocked: true,
-      doorUnlocked: true,
     },
     successMessageId: 'puzzle.typewriter.complete',
   },
@@ -58,11 +57,12 @@ export const studyPuzzleRewards: Record<StudyPuzzleId, PuzzleRewardDefinition> =
   },
   'portrait-time': {
     puzzleId: 'portrait-time',
+    acquireItemIds: ['study-key'],
     discoverClueIds: ['final-time-clue'],
     setFlags: {
       portraitClueFound: true,
       finalTimeSolved: true,
+      studyKeyFound: true,
     },
   },
 };
-

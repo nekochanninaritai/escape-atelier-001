@@ -1,12 +1,13 @@
 import type { ItemDefinition } from '../../../engine/inventory/types';
 import { studyItemImages } from './imageAssets';
+import { BOOK_CLUE, CIPHER_SHIFT, TYPEWRITER_ENCODED_TEXT } from './puzzles';
 import type { StudyItemId } from '../types';
 
 export const studyItems: Record<StudyItemId, ItemDefinition> = {
   'diary-piece-01': {
     id: 'diary-piece-01',
     name: '日記の破れたページ1',
-    description: '古い日記から破り取られた紙片。文章の一部が残っている。',
+    description: '春の記憶が残る紙片。「赤い封を焦らずあたためる」と読める。',
     image: studyItemImages.diaryPiece01,
     alt: '日記の破れたページ1',
     inspectable: true,
@@ -15,7 +16,7 @@ export const studyItems: Record<StudyItemId, ItemDefinition> = {
   'diary-piece-02': {
     id: 'diary-piece-02',
     name: '日記の破れたページ2',
-    description: '薄いインクで季節のことが書かれた日記の紙片。',
+    description: '夏の記憶が残る紙片。余白に「書斎へ戻る道は方角で残す」とある。',
     image: studyItemImages.diaryPiece02,
     alt: '日記の破れたページ2',
     inspectable: true,
@@ -24,7 +25,7 @@ export const studyItems: Record<StudyItemId, ItemDefinition> = {
   'diary-piece-03': {
     id: 'diary-piece-03',
     name: '日記の破れたページ3',
-    description: '端が少し焦げた日記の紙片。冬の日付だけが読める。',
+    description: '秋の記憶が残る紙片。端に赤い線がかすかに写っている。',
     image: studyItemImages.diaryPiece03,
     alt: '日記の破れたページ3',
     inspectable: true,
@@ -33,7 +34,7 @@ export const studyItems: Record<StudyItemId, ItemDefinition> = {
   'sealed-letter': {
     id: 'sealed-letter',
     name: '封じられた手紙',
-    description: '赤い封蝋で固く閉じられている。無理に開くと破れそうだ。',
+    description: '赤い封蝋で閉じられている。無理に開くと紙まで破れてしまいそうだ。',
     image: studyItemImages.sealedLetter,
     alt: '封じられた手紙',
     inspectable: true,
@@ -42,24 +43,25 @@ export const studyItems: Record<StudyItemId, ItemDefinition> = {
   'heated-letter': {
     id: 'heated-letter',
     name: '温めた手紙',
-    description: '暖炉の熱で封蝋が柔らかくなっている。',
+    description: '封蝋が柔らかくなっている。今なら紙を傷めずに開けられそうだ。',
     image: studyItemImages.heatedLetter,
     alt: '温めた手紙',
     inspectable: true,
-    clueIdOnInspect: 'opened-letter-directions',
   },
   'opened-letter': {
     id: 'opened-letter',
-    name: '開封された手紙',
-    description: '中には方角と数字が記されている。',
+    name: '開封した手紙',
+    description: '手紙には「N 2 / E 1 / S 3 / W 1」と記されている。',
     image: studyItemImages.openedLetter,
-    alt: '開封された手紙',
+    alt: '開封した手紙',
     inspectable: true,
+    zoomable: true,
+    clueIdOnInspect: 'opened-letter-directions',
   },
   'paper-knife': {
     id: 'paper-knife',
     name: '真鍮のペーパーナイフ',
-    description: '古い真鍮製のペーパーナイフ。まだ刃は使えそうだ。',
+    description: '古い真鍮製のペーパーナイフ。封を傷つけず開くための道具だ。',
     image: studyItemImages.paperKnife,
     alt: '真鍮のペーパーナイフ',
     persistent: true,
@@ -68,14 +70,15 @@ export const studyItems: Record<StudyItemId, ItemDefinition> = {
   'ink-ribbon': {
     id: 'ink-ribbon',
     name: 'インクリボン',
-    description: '古いタイプライター用のインクリボン。',
+    description: 'タイプライター用のインクリボン。少し乾いているが、まだ文字を刻めそうだ。',
     image: studyItemImages.inkRibbon,
     alt: 'インクリボン',
+    inspectable: true,
   },
   'cipher-sheet': {
     id: 'cipher-sheet',
     name: '暗号表',
-    description: '文字の対応が記された古い表。',
+    description: `Aを${CIPHER_SHIFT}文字進めて読む古い換字表。紙の端には「${TYPEWRITER_ENCODED_TEXT}」とある。`,
     image: studyItemImages.cipherSheet,
     alt: '暗号表',
     inspectable: true,
@@ -85,7 +88,7 @@ export const studyItems: Record<StudyItemId, ItemDefinition> = {
   'transparent-sheet': {
     id: 'transparent-sheet',
     name: '半透明の紙',
-    description: '薄い半透明の紙。いくつかの線と印が描かれている。',
+    description: '薄い半透明の紙。赤い線と小さな印があり、別の紙に重ねるためのものらしい。',
     image: studyItemImages.transparentSheet,
     alt: '半透明の紙',
     inspectable: true,
@@ -94,27 +97,27 @@ export const studyItems: Record<StudyItemId, ItemDefinition> = {
   },
   'typed-paper': {
     id: 'typed-paper',
-    name: 'タイプライターから出た紙',
-    description: '点と線だけが印字されている。',
+    name: 'タイプライターの紙',
+    description: '文字の一部だけが打たれている。半透明の紙を重ねると意味が出そうだ。',
     image: studyItemImages.typedPaper,
-    alt: 'タイプライターから出た紙',
+    alt: 'タイプライターの紙',
     inspectable: true,
     zoomable: true,
     clueIdOnInspect: 'typed-paper',
   },
   'overlay-clue': {
     id: 'overlay-clue',
-    name: '重ね合わせた手がかり',
-    description: '二枚の紙を重ねることで、意味のある情報が現れた。',
+    name: '重なった手掛かり',
+    description: `半透明の紙を重ねると「BOOK ${BOOK_CLUE.bookNumber} / PAGE ${BOOK_CLUE.page}」と読めた。`,
     image: studyItemImages.overlayClue,
-    alt: '重ね合わせた手がかり',
+    alt: '重なった手掛かり',
     inspectable: true,
     clueIdOnInspect: 'overlay-result',
   },
   'study-key': {
     id: 'study-key',
     name: '書斎の鍵',
-    description: '古い書斎の出口に使えそうな重い鍵。',
+    description: '出口の扉に合う、重い真鍮の鍵。温かい記憶のように手の中へ沈む。',
     image: studyItemImages.studyKey,
     alt: '書斎の鍵',
     inspectable: true,

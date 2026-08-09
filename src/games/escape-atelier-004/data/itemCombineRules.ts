@@ -8,6 +8,6 @@ export const studyItemCombineRules: ItemCombineRule[] = [
     keepItemIds: ['paper-knife'],
     resultItemIds: ['opened-letter'],
     setFlags: { letterOpened: true },
-    successMessage: '柔らかくなった封蝋にペーパーナイフを差し入れ、手紙を開いた。',
+    successMessage: '柔らかくなった封蝋へ刃先を差し入れる。手紙を傷つけず、封を開けることができた。',
   },
 ];

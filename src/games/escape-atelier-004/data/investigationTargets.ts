@@ -11,14 +11,18 @@ export const studyInvestigationTargets: Record<string, InvestigationTargetDefini
   'exit-door': { id: 'exit-door', label: '出口の扉', sceneId: 'exit-door', category: 'location' },
   'diary-restore': { id: 'diary-restore', label: '日記復元', category: 'document', clueIdOnInspect: 'diary-restored' },
   'paper-overlay': { id: 'paper-overlay', label: '半透明紙の重ね合わせ', category: 'code', clueIdOnInspect: 'overlay-result' },
+  bookshelfPuzzle: { id: 'bookshelfPuzzle', label: 'BOOK/PAGE の指定', sceneId: 'bookshelf', category: 'code', clueIdOnInspect: 'selected-book' },
+  portraitTime: { id: 'portraitTime', label: '肖像画の時刻合わせ', sceneId: 'portrait', category: 'observation', clueIdOnInspect: 'final-time-clue' },
 };
 
 export const studyInvestigationTargetLabels = Object.fromEntries(Object.values(studyInvestigationTargets).map((target) => [target.id, target.label]));
 
 export function resolveInvestigationMessage(targetId: string, flags: Record<string, boolean>) {
-  if (targetId === 'typewriter' && flags.typewriterReady) return 'インクリボンを取り付けた。文字を打てそうだ。';
-  if (targetId === 'typewriter') return '古いタイプライターだ。インクリボンがない。';
+  if (targetId === 'typewriter' && flags.typewriterReady) return 'インクリボンを取り付けた。キーを押せば文字を打てそうだ。';
+  if (targetId === 'typewriter') return '古いタイプライター。インクリボンがない。';
   if (targetId === 'fireplace' && flags.letterHeated) return '暖炉の熱で、封蝋を柔らかくできた。';
-  if (targetId === 'desk' && flags.paperAligned) return '手紙には REMEMBER という言葉が浮かんでいる。';
+  if (targetId === 'desk' && flags.paperAligned) return '机の紙には BOOK と PAGE の手掛かりが残った。';
+  if (targetId === 'globe' && flags.globeSolved) return '地球儀の航路は開き、タイプライターの周りが動いたようだ。';
+  if (targetId === 'portrait' && flags.finalTimeSolved) return '肖像画の裏から鍵が現れた。';
   return `${studyInvestigationTargets[targetId]?.label ?? targetId}を調べた。`;
 }

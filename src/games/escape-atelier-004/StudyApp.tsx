@@ -16,6 +16,9 @@ import { isCorrectTypewriterCode } from './data/puzzles';
 import { resolveInvestigationMessage, studyInvestigationTargetLabels } from './data/investigationTargets';
 import { sceneCopy, studyHotspots } from './data/scenes';
 import { endingPages, prologuePages } from './data/story';
+import { BookshelfPuzzle } from './components/puzzles/BookshelfPuzzle';
+import { PortraitTimePuzzle } from './components/puzzles/PortraitTimePuzzle';
+import { TypewriterPuzzle } from './components/puzzles/TypewriterPuzzle';
 import { createDiaryRestorePuzzleConfig } from './puzzles/diary-restore/config';
 import { createMemoryGlobePuzzleConfig } from './puzzles/memory-globe/config';
 import { createPaperOverlayPuzzleConfig } from './puzzles/paper-overlay/config';
@@ -64,56 +67,71 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
 
   const handleSceneAction = () => {
     if (state.currentScene === 'bookshelf') {
-      if (!state.collectedItems.includes('diary-piece-01')) collect('diary-piece-01', '本の隙間から、日記の破れたページが一枚すべり落ちた。');
+      if (!state.collectedItems.includes('diary-piece-02')) collect('diary-piece-02', '左の棚から、日記の破れたページが一枚すべり落ちた。');
+      else if (!state.collectedItems.includes('cipher-sheet')) {
+        collect('cipher-sheet', '中央の棚の薄い本から、古い暗号表を見つけた。');
+        discoverClue('cipher-table');
+      }
       else if (!['diary-piece-01', 'diary-piece-02', 'diary-piece-03'].every((itemId) => state.collectedItems.includes(itemId as StudyItemId))) showMessage('日記を戻すには、まだ足りないページがある。');
       else if (!solved.has('diary-repair')) setPuzzle('diary');
-      else showMessage('日記は春から冬へ、静かに順番を取り戻している。');
+      else if (state.flags.overlaySolved && !solved.has('bookshelf')) showMessage('重なった手掛かりの本とページを選べそうだ。');
+      else showMessage('本棚は静かだ。必要な手掛かりが揃えば、指定された本を開ける。');
       return;
     }
     if (state.currentScene === 'fireplace') {
       if (state.selectedItemId === 'sealed-letter') {
         dispatch({ type: 'USE_ITEM_ON_TARGET', itemId: 'sealed-letter', targetId: 'fireplace' });
         showMessage('封蝋が少し柔らかくなった。');
-      } else if (!state.collectedItems.includes('sealed-letter')) collect('sealed-letter', '暖炉の灰の奥から、封じられた手紙を拾った。');
+      } else if (!state.flags.diaryRestored) showMessage('暖炉には弱い熱が残っている。何かを温める手掛かりが必要だ。');
       else showMessage('灰の中には、もう読めるものは残っていない。');
       return;
     }
     if (state.currentScene === 'side-table') {
-      if (!state.collectedItems.includes('transparent-sheet')) collect('transparent-sheet', '小さな引き出しから、赤い線の入った半透明の紙を見つけた。');
-      else if (!state.collectedItems.includes('paper-knife')) collect('paper-knife', '引き出しの奥に、真鍮のペーパーナイフが残されていた。');
+      if (!state.collectedItems.includes('diary-piece-03')) collect('diary-piece-03', '小さな引き出しの奥から、日記の破れたページを見つけた。');
+      else if (!state.collectedItems.includes('transparent-sheet')) {
+        dispatch({ type: 'SET_FLAG', key: 'transparentSheetFound', value: true });
+        collect('transparent-sheet', '赤い線の入った半透明の紙を見つけた。');
+      }
       else showMessage('封蝋は割れている。誰かがここで返事を待っていたようだ。');
       return;
     }
     if (state.currentScene === 'portrait') {
-      if (!state.collectedItems.includes('diary-piece-02')) collect('diary-piece-02', '肖像画の裏から、日記の破れたページが見つかった。');
-      else showMessage(state.flags.diaryRestored ? '額縁の言葉が、復元した日記の季節と同じ順で光っている。' : '「忘れても、帰れる」。短い言葉が額縁に刻まれている。');
+      if (!solved.has('bookshelf')) showMessage('額縁には「忘れても、帰れる」と刻まれている。まだ時刻は分からない。');
+      else if (!solved.has('portrait-time')) showMessage('肖像画の裏に小さな時刻合わせがある。');
+      else showMessage('肖像画の裏は開き、鍵が取り出された。');
       return;
     }
     if (state.currentScene === 'desk') {
-      if (!state.flags.diaryRestored) showMessage('引き出しの中には日記の跡がある。先にページを復元できそうだ。');
-      else if (state.selectedItemId === 'transparent-sheet' && state.collectedItems.includes('opened-letter') && !state.flags.paperAligned) setPuzzle('paper');
-      else if (!state.collectedItems.includes('cipher-sheet')) collect('cipher-sheet', '机の引き出しから、古い暗号表を見つけた。');
-      else showMessage(state.flags.paperAligned ? '手紙には REMEMBER という言葉が浮かび上がっている。' : '手紙の文字は欠けている。何かを重ねれば読めるかもしれない。');
+      if (!state.collectedItems.includes('diary-piece-01')) collect('diary-piece-01', '引き出しの底から、日記の破れたページを見つけた。');
+      else if (!state.collectedItems.includes('paper-knife')) collect('paper-knife', '机の引き出しから、真鍮のペーパーナイフを見つけた。');
+      else if (!state.collectedItems.includes('sealed-letter')) {
+        collect('sealed-letter', '日記の下から、赤い封蝋で閉じられた手紙を拾った。');
+        discoverClue('sealed-letter');
+      }
+      else if (state.collectedItems.includes('typed-paper') && state.collectedItems.includes('transparent-sheet') && !state.flags.paperAligned) setPuzzle('paper');
+      else showMessage(state.flags.paperAligned ? '紙には BOOK 7 / PAGE 23 の手掛かりが残っている。' : '机には、まだ読めない紙片の記憶が残っている。');
       return;
     }
     if (state.currentScene === 'globe') {
-      if (!state.collectedItems.includes('diary-piece-03')) collect('diary-piece-03', '地球儀の台座から、日記の最後の破れたページを拾った。');
-      else if (!state.flags.diaryRestored) showMessage('地球儀は固く、まだ動かない。書斎の記憶が足りないようだ。');
+      if (!state.flags.diaryRestored) showMessage('地球儀は固く、まだ動かない。書斎の記憶が足りないようだ。');
+      else if (!state.flags.letterOpened) showMessage('地球儀には方角の入力がある。手掛かりになる手紙が必要だ。');
       else if (!state.flags.memoryRouteAligned) setPuzzle('globe');
       else showMessage('地球儀の航路は、書斎へ帰る道筋を指している。');
       return;
     }
     if (state.currentScene === 'typewriter') {
-      if (!state.flags.paperAligned) showMessage('タイプライターは沈黙している。打つべき言葉がまだわからない。');
+      if (!state.flags.memoryRouteAligned) showMessage('タイプライターは沈黙している。先に地球儀の航路を戻す必要がありそうだ。');
       else if (!state.collectedItems.includes('ink-ribbon')) collect('ink-ribbon', 'タイプライターの横から、乾きかけのインクリボンを見つけた。');
       else if (state.selectedItemId === 'ink-ribbon' && !state.flags.typewriterReady) {
         dispatch({ type: 'USE_ITEM_ON_TARGET', itemId: 'ink-ribbon', targetId: 'typewriter' });
         showMessage('インクリボンを戻した。キーを押せば、まだ文字を刻めそうだ。');
-      } else showMessage(state.flags.typewriterReady ? '浮かび上がった言葉を入力できそうだ。' : 'インクリボンを選んで取り付ける必要がある。');
+      } else if (!state.flags.typewriterReady) showMessage('インクリボンを選んで取り付ける必要がある。');
+      else if (!state.collectedItems.includes('cipher-sheet')) showMessage('打つべき言葉を読むための暗号表が必要だ。');
+      else showMessage('暗号表で読んだ言葉を入力できそうだ。');
       return;
     }
     if (state.currentScene === 'exit-door') {
-      if (!state.flags.exitDoorUnlocked && !state.flags.doorUnlocked) showMessage('扉は開かない。真鍮の鍵穴が、最後の記憶を待っている。');
+      if (!state.collectedItems.includes('study-key')) showMessage('扉は開かない。真鍮の鍵穴が、最後の記憶を待っている。');
       else if (state.selectedItemId !== 'study-key') showMessage('書斎の鍵を選べば、扉を開けられそうだ。');
       else setConfirmDoor(true);
     }
@@ -129,12 +147,7 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
       return;
     }
     dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'typewriter' });
-    dispatch({ type: 'SET_FLAG', key: 'typewriterSolved', value: true });
-    dispatch({ type: 'SET_FLAG', key: 'exitDoorUnlocked', value: true });
-    dispatch({ type: 'SET_FLAG', key: 'doorUnlocked', value: true });
-    dispatch({ type: 'ACQUIRE_ITEM', itemId: 'typed-paper' });
-    dispatch({ type: 'ACQUIRE_ITEM', itemId: 'study-key' });
-    showMessage('最後の文字が打たれると、真鍮の鍵が机の奥から現れた。');
+    showMessage('最後の文字が打たれると、タイプライターから紙が一枚送り出された。');
   };
 
   if (state.currentScene === 'title') {
@@ -236,9 +249,10 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
           instructions="ページを入れ替え、季節の記憶を正しい順番へ戻してください。"
           initialState={state.puzzleStates.diaryRepair}
           createConfig={createDiaryRestorePuzzleConfig}
-          onCancel={(nextState) => { dispatch({ type: 'SET_DIARY_ORDER', pageOrder: nextState.pageOrder }); setPuzzle(null); }}
+          onStateChange={(nextState) => dispatch({ type: 'SET_DIARY_REPAIR_STATE', state: nextState })}
+          onCancel={(nextState) => { dispatch({ type: 'SET_DIARY_REPAIR_STATE', state: nextState }); setPuzzle(null); }}
           onComplete={(nextState) => {
-            dispatch({ type: 'SET_DIARY_ORDER', pageOrder: nextState.pageOrder });
+            dispatch({ type: 'SET_DIARY_REPAIR_STATE', state: nextState });
             dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'diary-repair' });
             dispatch({ type: 'SET_FLAG', key: 'diaryRestored', value: true });
             dispatch({ type: 'SET_FLAG', key: 'globeUnlocked', value: true });
@@ -255,6 +269,7 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
           instructions="館を巡った記憶の航路を順番に選んでください。"
           initialState={state.puzzleStates.globe}
           createConfig={createMemoryGlobePuzzleConfig}
+          onStateChange={(nextState) => dispatch({ type: 'SET_GLOBE_ROUTES', selectedRouteIds: nextState.selectedRouteIds })}
           onCancel={(nextState) => { dispatch({ type: 'SET_GLOBE_ROUTES', selectedRouteIds: nextState.selectedRouteIds }); setPuzzle(null); }}
           onComplete={(nextState) => {
             dispatch({ type: 'SET_GLOBE_ROUTES', selectedRouteIds: nextState.selectedRouteIds });
@@ -271,6 +286,7 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
           instructions="紙を動かして、手紙の欠けた文字を読める位置へ重ねてください。"
           initialState={state.puzzleStates.overlayPaper}
           createConfig={createPaperOverlayPuzzleConfig}
+          onStateChange={(nextState) => dispatch({ type: 'SET_PAPER_OVERLAY', state: nextState })}
           onCancel={(nextState) => { dispatch({ type: 'SET_PAPER_OVERLAY', state: nextState }); setPuzzle(null); }}
           onComplete={(nextState) => {
             dispatch({ type: 'SET_PAPER_OVERLAY', state: nextState });
@@ -280,7 +296,7 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
             dispatch({ type: 'ACQUIRE_ITEM', itemId: 'overlay-clue' });
             dispatch({ type: 'RECORD_INVESTIGATION', targetId: 'paper-overlay', message: '半透明の紙を重ね、文字を読んだ。' });
             setPuzzle(null);
-            showMessage('欠けた文字が重なり、REMEMBER という言葉が読めるようになった。');
+            showMessage('欠けた文字が重なり、BOOK 7 / PAGE 23 と読めるようになった。');
           }}
         />
       )}
@@ -289,24 +305,42 @@ export function StudyApp({ onSeriesSelect, launchMode }: { onSeriesSelect: () =>
 }
 
 function FocusPanel({ sceneId, onAction, onTypewriterSubmit }: { sceneId: StudySceneId; onAction: () => void; onTypewriterSubmit: () => void }) {
-  const { state, dispatch } = useStudy();
+  const { state, dispatch, showMessage } = useStudy();
   const copy = sceneCopy[sceneId as keyof typeof sceneCopy];
   if (!copy) return null;
+  const solved = new Set(state.solvedPuzzles);
   return (
     <div className="studyFocus">
       <h2>{copy.title}</h2>
       <p>{copy.description}</p>
-      {sceneId === 'typewriter' && state.flags.typewriterReady ? (
-        <div className="typewriterPanel">
-          <input
-            type="text"
-            value={state.puzzleStates.typewriter.input}
-            maxLength={16}
-            onChange={(event) => dispatch({ type: 'SET_TYPEWRITER_INPUT', input: event.target.value })}
-            aria-label="タイプライターへ入力する言葉"
-          />
-          <button type="button" onClick={onTypewriterSubmit}>打ち終える</button>
-        </div>
+      {sceneId === 'typewriter' && state.flags.typewriterReady && state.collectedItems.includes('cipher-sheet') && !solved.has('typewriter') ? (
+        <TypewriterPuzzle
+          state={state.puzzleStates.typewriter}
+          onChange={(nextState) => dispatch({ type: 'SET_TYPEWRITER_INPUT', input: nextState.input })}
+          onComplete={onTypewriterSubmit}
+        />
+      ) : null}
+      {sceneId === 'bookshelf' && state.flags.overlaySolved && !solved.has('bookshelf') ? (
+        <BookshelfPuzzle
+          state={state.puzzleStates.bookshelf}
+          onChange={(nextState) => dispatch({ type: 'SET_BOOKSHELF_STATE', state: nextState })}
+          onComplete={() => {
+            dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'bookshelf' });
+            dispatch({ type: 'RECORD_INVESTIGATION', targetId: 'bookshelfPuzzle', message: 'BOOK 7 の PAGE 23 を開いた。' });
+            showMessage('ページに「肖像画の時刻は七時十五分」と記されていた。');
+          }}
+        />
+      ) : null}
+      {sceneId === 'portrait' && solved.has('bookshelf') && !solved.has('portrait-time') ? (
+        <PortraitTimePuzzle
+          state={state.puzzleStates.portraitTime}
+          onChange={(nextState) => dispatch({ type: 'SET_PORTRAIT_TIME', state: nextState })}
+          onComplete={() => {
+            dispatch({ type: 'SOLVE_PUZZLE', puzzleId: 'portrait-time' });
+            dispatch({ type: 'RECORD_INVESTIGATION', targetId: 'portraitTime', message: '肖像画の時刻を07:15に合わせた。' });
+            showMessage('肖像画の裏から、書斎の鍵が滑り落ちた。');
+          }}
+        />
       ) : null}
       <button type="button" onClick={onAction}>調べる / 使う</button>
     </div>
@@ -448,7 +482,10 @@ function getStageImage(sceneId: StudySceneId, state: StudyGameState) {
 function getCurrentHintPuzzle(state: StudyGameState): StudyPuzzleId {
   if (!state.flags.diaryRestored) return 'diary-repair';
   if (!state.flags.memoryRouteAligned) return 'globe';
+  if (!state.flags.typewriterSolved) return 'typewriter';
   if (!state.flags.paperAligned) return 'overlay-paper';
+  if (!state.flags.targetBookOpened) return 'bookshelf';
+  if (!state.flags.finalTimeSolved) return 'portrait-time';
   return 'typewriter';
 }
 

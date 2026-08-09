@@ -53,8 +53,9 @@ describe('Escape Atelier #004 game state foundation', () => {
     const restored = parseStudyState(serializeStudyState(solved));
     expect(restored.version).toBe(3);
     expect(restored.solvedPuzzles).toEqual(['typewriter']);
-    expect(restored.collectedItems).toEqual(['typed-paper', 'study-key']);
-    expect(restored.flags.exitDoorUnlocked).toBe(true);
+    expect(restored.collectedItems).toEqual(['typed-paper']);
+    expect(restored.flags.typewriterSolved).toBe(true);
+    expect(restored.flags.exitDoorUnlocked).toBe(false);
   });
 
   it('falls back to a playable initial state for broken save values', () => {
@@ -78,5 +79,21 @@ describe('Escape Atelier #004 game state foundation', () => {
     expect(second.state.solvedPuzzles).toEqual(['overlay-paper']);
     expect(second.state.collectedItems).toEqual(['overlay-clue']);
     expect(second.state.notebook.clues.map((clue) => clue.clueId)).toEqual(['overlay-result']);
+  });
+
+  it('connects the main puzzle reward chain through the study key', () => {
+    const diary = applyPuzzleReward(createInitialStudyGameState(), 'diary-repair').state;
+    const globe = applyPuzzleReward(diary, 'globe').state;
+    const typewriter = applyPuzzleReward(globe, 'typewriter').state;
+    const overlay = applyPuzzleReward(typewriter, 'overlay-paper').state;
+    const bookshelf = applyPuzzleReward(overlay, 'bookshelf').state;
+    const portrait = applyPuzzleReward(bookshelf, 'portrait-time').state;
+    const duplicatePortrait = applyPuzzleReward(portrait, 'portrait-time').state;
+
+    expect(portrait.solvedPuzzles).toEqual(['diary-repair', 'globe', 'typewriter', 'overlay-paper', 'bookshelf', 'portrait-time']);
+    expect(portrait.collectedItems).toEqual(['typed-paper', 'overlay-clue', 'study-key']);
+    expect(portrait.flags.studyKeyFound).toBe(true);
+    expect(portrait.flags.finalTimeSolved).toBe(true);
+    expect(duplicatePortrait.collectedItems).toEqual(portrait.collectedItems);
   });
 });

@@ -11,7 +11,7 @@ export const studyItemUseRules: ItemUseRule[] = [
       transform: { from: 'sealed-letter', to: 'heated-letter' },
       setFlags: { letterHeated: true },
     },
-    successMessage: '封蝋が少し柔らかくなった。',
+    successMessage: '暖炉の熱に近づけると、赤い封蝋が少し柔らかくなった。',
     failureMessage: 'ここでは手紙を温められない。',
   },
   {

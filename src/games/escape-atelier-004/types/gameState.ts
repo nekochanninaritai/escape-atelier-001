@@ -94,10 +94,13 @@ export type StudyAction =
   | { type: 'COMPLETE_PUZZLE'; puzzleId: StudyPuzzleId }
   | { type: 'INSPECT'; pointId: string }
   | { type: 'SET_FLAG'; key: keyof StudyFlags; value: boolean }
+  | { type: 'SET_DIARY_REPAIR_STATE'; state: StudyPuzzleStates['diaryRepair'] }
   | { type: 'SET_DIARY_ORDER'; pageOrder: string[] }
   | { type: 'SET_GLOBE_ROUTES'; selectedRouteIds: string[] }
   | { type: 'SET_PAPER_OVERLAY'; state: StudyPuzzleStates['overlayPaper'] }
   | { type: 'SET_TYPEWRITER_INPUT'; input: string }
+  | { type: 'SET_BOOKSHELF_STATE'; state: StudyPuzzleStates['bookshelf'] }
+  | { type: 'SET_PORTRAIT_TIME'; state: StudyPuzzleStates['portraitTime'] }
   | { type: 'VIEW_HINT'; puzzleId: StudyPuzzleId; level: number }
   | { type: 'DISCOVER_CLUE'; clueId: string }
   | { type: 'MARK_CLUE_READ'; clueId: string }
@@ -108,4 +111,3 @@ export type StudyAction =
   | { type: 'RESET' };
 
 export const isStudyItemId = (itemId: ItemId): itemId is StudyItemId => STUDY_ITEM_IDS.includes(itemId as StudyItemId);
-

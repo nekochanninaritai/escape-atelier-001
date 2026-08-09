@@ -88,6 +88,8 @@ export function studyReducer(state: StudyGameState, action: StudyAction): StudyG
       return { ...state, inspectedPoints: unique([...state.inspectedPoints, action.pointId]) };
     case 'SET_FLAG':
       return { ...state, flags: { ...state.flags, [action.key]: action.value } };
+    case 'SET_DIARY_REPAIR_STATE':
+      return { ...state, puzzleStates: { ...state.puzzleStates, diaryRepair: action.state } };
     case 'SET_DIARY_ORDER':
       return { ...state, puzzleStates: { ...state.puzzleStates, diaryRepair: { ...state.puzzleStates.diaryRepair, pageOrder: action.pageOrder } } };
     case 'SET_GLOBE_ROUTES':
@@ -96,6 +98,10 @@ export function studyReducer(state: StudyGameState, action: StudyAction): StudyG
       return { ...state, puzzleStates: { ...state.puzzleStates, overlayPaper: action.state } };
     case 'SET_TYPEWRITER_INPUT':
       return { ...state, puzzleStates: { ...state.puzzleStates, typewriter: { input: action.input } } };
+    case 'SET_BOOKSHELF_STATE':
+      return { ...state, puzzleStates: { ...state.puzzleStates, bookshelf: action.state } };
+    case 'SET_PORTRAIT_TIME':
+      return { ...state, puzzleStates: { ...state.puzzleStates, portraitTime: action.state } };
     case 'VIEW_HINT':
       return { ...state, viewedHints: { ...state.viewedHints, [action.puzzleId]: Math.max(state.viewedHints[action.puzzleId] ?? 0, action.level) } };
     case 'DISCOVER_CLUE': {
